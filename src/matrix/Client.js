@@ -214,6 +214,74 @@ export class Client {
             }
         });
     }
+    async startWithExistsToken(accessData, {inspectAccountSetup} = {}) {
+        const currentStatus = this._status.get();
+        if (currentStatus !== LoadStatus.LoginFailed &&
+            currentStatus !== LoadStatus.NotLoading &&
+            currentStatus !== LoadStatus.Error) {
+            return;
+        }
+        this._resetStatus();
+        await this._platform.logger.run("login", async log => {
+            this._status.set(LoadStatus.Login);
+            const clock = this._platform.clock;
+            let sessionInfo;
+            try {
+                const request = this._platform.request;
+                // const hsApi = new HomeServerApi({homeserver: loginMethod.homeserver, request});
+                // const loginData = await loginMethod.login(hsApi, "Hydrogen", log);
+                const sessionId = this.createNewSessionId();
+                sessionInfo = {
+                    id: sessionId,
+                    deviceId: accessData.device_id,
+                    userId: accessData.user_id,
+                    homeServer: accessData.homeserver, // deprecate this over time
+                    homeserver: accessData.homeserver,
+                    accessToken: accessData.access_token,
+                    lastUsed: clock.now()
+                };
+                log.set("id", sessionId);
+            } catch (err) {
+                this._error = err;
+                if (err.name === "HomeServerError") {
+                    if (err.errcode === "M_FORBIDDEN") {
+                        this._loginFailure = LoginFailure.Credentials;
+                    } else {
+                        this._loginFailure = LoginFailure.Unknown;
+                    }
+                    log.set("loginFailure", this._loginFailure);
+                    this._status.set(LoadStatus.LoginFailed);
+                } else if (err.name === "ConnectionError") {
+                    this._loginFailure = LoginFailure.Connection;
+                    this._status.set(LoadStatus.LoginFailed);
+                } else {
+                    this._status.set(LoadStatus.Error);
+                }
+                return;
+            }
+            let dehydratedDevice;
+            if (inspectAccountSetup) {
+                dehydratedDevice = await this._inspectAccountAfterLogin(sessionInfo, log);
+                if (dehydratedDevice) {
+                    sessionInfo.deviceId = dehydratedDevice.deviceId;
+                }
+            }
+            await this._platform.sessionInfoStorage.add(sessionInfo);
+            // loading the session can only lead to
+            // LoadStatus.Error in case of an error,
+            // so separate try/catch
+            try {
+                await this._loadSessionInfo(sessionInfo, dehydratedDevice, log);
+                log.set("status", this._status.get());
+            } catch (err) {
+                log.catch(err);
+                // free olm Account that might be contained
+                dehydratedDevice?.dispose();
+                this._error = err;
+                this._status.set(LoadStatus.Error);
+            }
+        });
+    }
 
     async _loadSessionInfo(sessionInfo, dehydratedDevice, log) {
         log.set("appVersion", this._platform.version);
