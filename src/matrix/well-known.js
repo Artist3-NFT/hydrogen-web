@@ -15,11 +15,7 @@ limitations under the License.
 */
 
 function normalizeHomeserver(homeserver) {
-    try {
-        return new URL(homeserver).origin;
-    } catch (err) {
-        return new URL(`https://${homeserver}`).origin;
-    }
+    return homeserver
 }
 
 async function getWellKnownResponse(homeserver, request) {

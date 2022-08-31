@@ -9,7 +9,7 @@
             "require": "./lib-build/hydrogen.cjs.js"
         },
         "./paths/vite": "./paths/vite.js",
-        "./style.css": "./asset-build/assets/theme-element-light.css",
+        "./style.css": "./asset-build/assets/theme-element-dark.css",
         "./theme-element-light.css": "./asset-build/assets/theme-element-light.css",
         "./theme-element-dark.css": "./asset-build/assets/theme-element-dark.css",
         "./main.js": "./asset-build/assets/main.js",
