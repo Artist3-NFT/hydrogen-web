@@ -6,7 +6,7 @@ const hydrogenViewSdk = require('hydrogen-view-sdk');
 // Worker
 require.resolve('hydrogen-view-sdk/main.js');
 // Styles
-require.resolve('hydrogen-view-sdk/assets/theme-element-light.css');
+require.resolve('hydrogen-view-sdk/assets/theme-element-dark.css');
 // Can access files in the assets/* directory
 require.resolve('hydrogen-view-sdk/assets/main.js');
 

@@ -20,7 +20,7 @@ limitations under the License.
 @import url('timeline.css');
 
 #hydrogen-container {
-    font-size: 10px;
+    font-size: 14px;
     /* Theme aliases */
     --icon-color: var(--background-color-secondary--darker-40);
     --light-border: var(--background-color-secondary--darker-5);
@@ -862,7 +862,7 @@ button.link {
     background-color: transparent;
     text-align: left;
     padding: 8px 32px 8px 8px;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     height: 24px;
     cursor: pointer;
 }
