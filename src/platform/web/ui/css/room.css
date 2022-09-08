@@ -62,6 +62,7 @@ limitations under the License.
 .MessageComposer_input {
     display: flex;
     align-items: center;
+    background-color: var(--background-color-secondary);
 }
 
 .MessageComposer_input > input {

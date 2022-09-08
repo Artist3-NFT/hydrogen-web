@@ -17,6 +17,7 @@
                     "error-color": "#FF4B55",
                     "fixed-white": "#fff",
                     "room-badge": "#61708b",
+                    "common-light-border": "#4A4A4A",
                     "link-color": "#238cf5"
                 }
             }
