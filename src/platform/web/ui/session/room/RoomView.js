@@ -18,6 +18,7 @@ limitations under the License.
 import {TemplateView} from "../../general/TemplateView";
 import {Popup} from "../../general/Popup.js";
 import {Menu} from "../../general/Menu.js";
+import {splitNamePrefix} from "../../../utils/someUtils";
 import {TimelineView} from "./TimelineView";
 import {TimelineLoadingView} from "./TimelineLoadingView.js";
 import {MessageComposer} from "./MessageComposer.js";
@@ -37,7 +38,7 @@ export class RoomView extends TemplateView {
                 t.a({className: "button-utility close-middle", href: vm.closeUrl, title: vm.i18n`Close room`}),
                 t.view(new AvatarView(vm, 32)),
                 t.div({className: "room-description"}, [
-                    t.h2(vm => vm.name),
+                    t.h2(vm => splitNamePrefix(vm.name)),
                 ]),
                 t.button({
                     className: "button-utility room-options",

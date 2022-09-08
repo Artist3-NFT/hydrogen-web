@@ -19,7 +19,7 @@ limitations under the License.
 @import url('inter.css');
 @import url('timeline.css');
 
-:root {
+#hydrogen-container {
     font-size: 10px;
     /* Theme aliases */
     --icon-color: var(--background-color-secondary--darker-40);
