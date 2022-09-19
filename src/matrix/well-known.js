@@ -19,6 +19,7 @@ function normalizeHomeserver(homeserver) {
 }
 
 async function getWellKnownResponse(homeserver, request) {
+    return null
     const requestOptions = {format: "json", timeout: 30000, method: "GET"};
     try {
         const wellKnownUrl = `${homeserver}/.well-known/matrix/client`;
