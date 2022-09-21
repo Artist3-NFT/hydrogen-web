@@ -57,10 +57,12 @@
     "xxhashjs": "^0.2.2"
   },
   "dependencies": {
+    "@emoji-mart/data": "^1.0.6",
     "@matrix-org/olm": "https://gitlab.matrix.org/api/v4/projects/27/packages/npm/@matrix-org/olm/-/@matrix-org/olm-3.2.8.tgz",
     "another-json": "^0.2.0",
     "base64-arraybuffer": "^0.2.0",
     "dompurify": "^2.3.0",
+    "emoji-mart": "^5.2.2",
     "off-color": "^2.0.0"
   }
 }

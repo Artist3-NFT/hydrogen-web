@@ -14,15 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {TemplateView} from "../../general/TemplateView";
-import {Popup} from "../../general/Popup.js";
-import {Menu} from "../../general/Menu.js";
+import { TemplateView } from "../../general/TemplateView";
+import { Popup } from "../../general/Popup.js";
+import { Menu } from "../../general/Menu.js";
 
 export class MessageComposer extends TemplateView {
     constructor(viewModel, viewClassForTile) {
         super(viewModel);
         this._viewClassForTile = viewClassForTile;
         this._input = null;
+        this._EmkojiPicker = null;
         this._attachmentPopup = null;
         this._focusInput = null;
         this._rafResizeHandle = undefined;
@@ -48,33 +49,40 @@ export class MessageComposer extends TemplateView {
             const TileView = rvm && this._viewClassForTile(rvm);
             if (!TileView) { return null; }
             return t.div({
-                    className: "MessageComposer_replyPreview"
-                }, [
-                    t.span({ className: "replying" }, "Replying"),
-                    t.button({
-                        className: "cancel",
-                        onClick: () => this._clearReplyingTo()
-                    }, "Close"),
+                className: "MessageComposer_replyPreview"
+            }, [
+                t.span({ className: "replying" }, "Replying"),
+                t.button({
+                    className: "cancel",
+                    onClick: () => this._clearReplyingTo()
+                }, "Close"),
                 t.view(new TileView(rvm, this._viewClassForTile, { interactive: false }, "div"))
             ]);
         });
-        const input = t.div({className: "MessageComposer_input"}, [
-            this._input,
+        const input = t.div({ className: "MessageComposer_input" }, [
+            t.button({
+                className: "emojiIcon",
+                title: vm.i18n`emoji`,
+                onClick: evt => this._toggleAttachmentEmoji(this._input, evt, vm),
+            }, vm.i18n`Send file`),
             t.button({
                 className: "sendFile",
                 title: vm.i18n`Pick attachment`,
                 onClick: evt => this._toggleAttachmentMenu(evt),
             }, vm.i18n`Send file`),
+            this._input,
             t.button({
                 className: "send",
                 title: vm.i18n`Send`,
                 onClick: () => this._trySend(),
             }, vm.i18n`Send`),
         ]);
-        return t.div({ className: {
-            MessageComposer: true,
-            MessageComposer_canSend: vm => vm.canSend
-        } }, [replyPreview, input]);
+        return t.div({
+            className: {
+                MessageComposer: true,
+                MessageComposer_canSend: vm => vm.canSend
+            }
+        }, [replyPreview, input]);
     }
 
     unmount() {
@@ -94,7 +102,7 @@ export class MessageComposer extends TemplateView {
         // and restore it when that didn't work somehow
         // to prevent the user from sending the message
         // every time they hit enter while it's still enqueuing.
-        const {value} = this._input;
+        const { value } = this._input;
         const restoreValue = () => {
             this._input.value = value;
             this._adjustHeight();
@@ -119,6 +127,34 @@ export class MessageComposer extends TemplateView {
         }
     }
 
+    onEmojiSelect(evt, ipt, vm) {
+        console.log(evt, ipt)
+        ipt.value = `${ipt.value}${evt.native}`
+        vm.setInput(ipt.value)
+    }
+    closeEmoji(event, thePicker) {
+        if (thePicker?.style?.display !== 'none') {
+            thePicker.style.display = 'none'
+            event.stopPropagation()
+        }
+    }
+    _toggleAttachmentEmoji(ipt, evt, vm) {
+        if (this._EmkojiPicker === null) {
+            this._EmkojiPicker = new EmojiMart.Picker({
+                previewPosition: 'bottom',
+                onEmojiSelect: (e) => this.onEmojiSelect(e, ipt, vm),
+                onClickOutside: (e) => this.closeEmoji(event, this._EmkojiPicker)
+            })
+    
+            document.body.appendChild(this._EmkojiPicker)
+        } else {
+            if (this._EmkojiPicker.style.display === 'none') {
+                this._EmkojiPicker.style.display = 'flex'
+                evt.stopPropagation()
+            }
+        }
+
+    }
     _toggleAttachmentMenu(evt) {
         if (this._attachmentPopup && this._attachmentPopup.isOpen) {
             this._attachmentPopup.close();

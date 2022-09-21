@@ -680,6 +680,20 @@ a {
     display: none;
 }
 
+.MessageComposer_input > button.emojiIcon {
+    width: 32px;
+    height: 32px;
+    display: block;
+    border: none;
+    text-indent: 200%;
+    white-space: nowrap;
+    overflow: hidden;
+    background-color: transparent;
+    background-image: url('icons/smile.svg?primary=icon-color');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 .MessageComposer:not(.MessageComposer_canSend) button.send {
     display: none;
 }
