@@ -24,6 +24,7 @@ export class AnnouncementView extends TemplateView {
 
     render(t) {
         if ((this.value?.announcement || '').indexOf('@u_') >= 0) return t.div()
+        if ((this.value?.announcement || '').indexOf('gamic_admin') >= 0) return t.div()
         return t.li({className: "AnnouncementView"}, t.div(vm => vm.announcement));
     }
     
