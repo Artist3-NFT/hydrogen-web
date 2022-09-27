@@ -90,6 +90,7 @@ limitations under the License.
 
 .Timeline_messageAvatar {
     grid-area: avatar;
+    cursor: pointer;
     text-decoration: none;
 }
 
