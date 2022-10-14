@@ -79,7 +79,7 @@ export class BaseMessageTile extends SimpleTile {
     }
 
     get date() {
-        return this._date && this._date.toLocaleDateString({}, {month: "numeric", day: "numeric"});
+        return this._date && this._date.toLocaleDateString({}, {month: "numeric", day: "numeric"}).split('/').join('-');
     }
 
     get time() {
