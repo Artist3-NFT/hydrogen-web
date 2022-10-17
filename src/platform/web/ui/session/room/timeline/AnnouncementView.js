@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {TemplateView} from "../../../general/TemplateView";
+import { TemplateView } from "../../../general/TemplateView";
 
 export class AnnouncementView extends TemplateView {
     // ignore other arguments
@@ -25,9 +25,10 @@ export class AnnouncementView extends TemplateView {
     render(t) {
         if ((this.value?.announcement || '').indexOf('@u_') >= 0) return t.div()
         if ((this.value?.announcement || '').indexOf('gamic_admin') >= 0) return t.div()
-        return t.li({className: "AnnouncementView"}, t.div(vm => vm.announcement));
+        const isJoining = (this.value?.announcement || '').endsWith('joined the room')
+        return t.li({ className: isJoining ? "AnnouncementView joining" : "AnnouncementView" }, t.div(vm => vm.announcement));
     }
-    
+
     /* This is called by the parent ListView, which just has 1 listener for the whole list */
-    onClick() {}
+    onClick() { }
 }

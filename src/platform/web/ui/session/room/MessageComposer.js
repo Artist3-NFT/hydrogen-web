@@ -71,11 +71,11 @@ export class MessageComposer extends TemplateView {
                 onClick: evt => this._toggleAttachmentMenu(evt),
             }, vm.i18n`Send file`),
             this._input,
-            t.button({
-                className: "send",
-                title: vm.i18n`Send`,
-                onClick: () => this._trySend(),
-            }, vm.i18n`Send`),
+            // t.button({
+            //     className: "send",
+            //     title: vm.i18n`Send`,
+            //     onClick: () => this._trySend(),
+            // }, vm.i18n`Send`),
         ]);
         return t.div({
             className: {
@@ -128,7 +128,6 @@ export class MessageComposer extends TemplateView {
     }
 
     onEmojiSelect(evt, ipt, vm) {
-        console.log(evt, ipt)
         ipt.value = `${ipt.value}${evt.native}`
         vm.setInput(ipt.value)
     }

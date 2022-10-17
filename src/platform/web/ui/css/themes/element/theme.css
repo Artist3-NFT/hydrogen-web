@@ -677,7 +677,7 @@ a {
 }
 
 .MessageComposer.MessageComposer_canSend button.sendFile {
-    display: none;
+    /* display: none; */
 }
 
 .MessageComposer_input > button.emojiIcon {
