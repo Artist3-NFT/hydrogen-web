@@ -36,6 +36,7 @@
 
         window.addEventListener("message", async function (event) {
             // if (event.origin === window.location.origin) {
+            console.log('downing,', event)
             if (event.data.type === "downloadBuffer") {
                 await downloadBuffer(event.data.buffer, event.data.mimeType, event.data.filename);
             } else if (event.data.type === "downloadBlob") {

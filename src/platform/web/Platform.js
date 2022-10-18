@@ -263,6 +263,7 @@ export class Platform {
     }
 
     createBlob(buffer, mimetype) {
+        console.log('createBlob:', buffer, mimetype)
         return BlobHandle.fromBuffer(buffer, mimetype);
     }
 
@@ -270,7 +271,8 @@ export class Platform {
         if (navigator.msSaveBlob) {
             navigator.msSaveBlob(blobHandle.nativeBlob, filename);
         } else {
-            downloadInIframe(this._container, this._assetPaths.downloadSandbox, blobHandle, filename, this.isIOS);
+            console.log('saveFileAs:', this._container, this._assetPaths.downloadSandbox, blobHandle, filename, this.isIOS)
+            // downloadInIframe(this._container, this._assetPaths.downloadSandbox, blobHandle, filename, this.isIOS);
         }
     }
 

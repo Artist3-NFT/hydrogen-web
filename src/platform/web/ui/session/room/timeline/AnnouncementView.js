@@ -25,7 +25,9 @@ export class AnnouncementView extends TemplateView {
     render(t) {
         if ((this.value?.announcement || '').indexOf('@u_') >= 0) return t.div()
         if ((this.value?.announcement || '').indexOf('gamic_admin') >= 0) return t.div()
-        const isJoining = (this.value?.announcement || '').endsWith('joined the room')
+
+        const isJoining = (this.value?.announcement || '').endsWith('joined the room') ||
+            (this.value?.announcement || '').indexOf('was invited to the room') >= 0
         return t.li({ className: isJoining ? "AnnouncementView joining" : "AnnouncementView" }, t.div(vm => vm.announcement));
     }
 
