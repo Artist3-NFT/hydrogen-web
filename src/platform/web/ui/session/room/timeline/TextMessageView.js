@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {tag, text} from "../../../general/html";
-import {BaseMessageView} from "./BaseMessageView.js";
-import {ReplyPreviewError, ReplyPreviewView} from "./ReplyPreviewView.js";
+import { tag, text } from "../../../general/html";
+import { BaseMessageView } from "./BaseMessageView.js";
+import { ReplyPreviewError, ReplyPreviewView } from "./ReplyPreviewView.js";
 
 export class TextMessageView extends BaseMessageView {
     renderMessageBody(t, vm) {
-        const time = t.time({className: {hidden: !vm.date}}, vm.date + " " + vm.time);
+        const time = t.time({ className: { hidden: !vm.time } }, vm.time);
         const container = t.div({
             className: {
                 "Timeline_messageBody": true,
@@ -83,10 +83,10 @@ function renderPill(pillPart) {
     // We don't call renderStaticAvatar because that would require
     // an intermediate object that has getAvatarUrl etc.
     const classes = `avatar size-12 usercolor${pillPart.avatarColorNumber}`;
-    const avatar = tag.div({class: classes}, text(pillPart.avatarInitials));
+    const avatar = tag.div({ class: classes }, text(pillPart.avatarInitials));
     const children = renderParts(pillPart.children);
     children.unshift(avatar);
-    return tag.a({class: "pill", href: pillPart.href, rel: "noopener", target: "_blank"}, children);
+    return tag.a({ class: "pill", href: pillPart.href, rel: "noopener", target: "_blank" }, children);
 }
 
 function renderTable(tablePart) {
@@ -109,12 +109,12 @@ function renderTable(tablePart) {
  * Map from part to function that outputs DOM for the part
  */
 const formatFunction = {
-    header: headerBlock => tag["h" + Math.min(6,headerBlock.level)](renderParts(headerBlock.inlines)),
+    header: headerBlock => tag["h" + Math.min(6, headerBlock.level)](renderParts(headerBlock.inlines)),
     codeblock: codeBlock => tag.pre(tag.code(text(codeBlock.text))),
     table: tableBlock => renderTable(tableBlock),
     code: codePart => tag.code(text(codePart.text)),
     text: textPart => text(textPart.text),
-    link: linkPart => tag.a({href: linkPart.url, className: "link", target: "_blank", rel: "noopener" }, renderParts(linkPart.inlines)),
+    link: linkPart => tag.a({ href: linkPart.url, className: "link", target: "_blank", rel: "noopener" }, renderParts(linkPart.inlines)),
     pill: renderPill,
     format: formatPart => tag[formatPart.format](renderParts(formatPart.children)),
     rule: () => tag.hr(),

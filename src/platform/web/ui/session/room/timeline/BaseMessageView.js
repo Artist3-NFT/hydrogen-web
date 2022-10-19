@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {renderStaticAvatar} from "../../../avatar";
-import {tag} from "../../../general/html";
-import {mountView} from "../../../general/utils";
-import {TemplateView} from "../../../general/TemplateView";
-import {Popup} from "../../../general/Popup.js";
-import {Menu} from "../../../general/Menu.js";
-import {ReactionsView} from "./ReactionsView.js";
+import { renderStaticAvatar } from "../../../avatar";
+import { tag } from "../../../general/html";
+import { mountView } from "../../../general/utils";
+import { TemplateView } from "../../../general/TemplateView";
+import { Popup } from "../../../general/Popup.js";
+import { Menu } from "../../../general/Menu.js";
+import { ReactionsView } from "./ReactionsView.js";
 
 export class BaseMessageView extends TemplateView {
     constructor(value, viewClassForTile, renderFlags, tagName = "li") {
@@ -37,14 +37,18 @@ export class BaseMessageView extends TemplateView {
     get _isReplyPreview() { return this._renderFlags?.reply; }
 
     render(t, vm) {
+        const timeTitle = t.div({ className: { hidden: !vm.date, timeTitle: true } });
+        const timeTitleTimer = t.time({ className: {} }, vm.date);
+        timeTitle.appendChild(timeTitleTimer)
         const children = [this.renderMessageBody(t, vm)];
         if (this._interactive) {
-            children.push(t.button({className: "Timeline_messageOptions"}, "⋯"));
+            children.push(t.button({ className: "Timeline_messageOptions" }, "⋯"));
         }
         const li = t.el(this._tagName, {
             className: {
                 "Timeline_message": true,
                 own: vm.isOwn,
+                newDay: !vm.isSameDay,
                 unsent: vm.isUnsent,
                 unverified: vm.isUnverified,
                 disabled: !this._interactive,
@@ -62,8 +66,8 @@ export class BaseMessageView extends TemplateView {
                 li.removeChild(li.querySelector(".Timeline_messageAvatar"));
                 li.removeChild(li.querySelector(".Timeline_messageSender"));
             } else if (!isContinuation && !this._isReplyPreview) {
-                const avatar = tag.div({'data-href': vm.memberPanelLink, className: "Timeline_messageAvatar"}, [renderStaticAvatar(vm, 30)]);
-                const sender = tag.div({className: `Timeline_messageSender usercolor${vm.avatarColorNumber}`}, vm.displayName);
+                const avatar = tag.div({ 'data-href': vm.memberPanelLink, className: "Timeline_messageAvatar" }, [renderStaticAvatar(vm, 30)]);
+                const sender = tag.div({ className: `Timeline_messageSender usercolor${vm.avatarColorNumber}` }, vm.displayName);
                 li.insertBefore(avatar, li.firstChild);
                 li.insertBefore(sender, li.firstChild);
             }
@@ -83,6 +87,7 @@ export class BaseMessageView extends TemplateView {
                 reactionsView = null;
             }
         });
+        li.appendChild(timeTitle)
         return li;
     }
 
@@ -123,7 +128,7 @@ export class BaseMessageView extends TemplateView {
         return options;
     }
 
-    renderMessageBody() {}
+    renderMessageBody() { }
 }
 
 class QuickReactionsMenuOption {
@@ -132,14 +137,16 @@ class QuickReactionsMenuOption {
     }
     toDOM(t) {
         const emojiButtons = ["👍", "👎", "😄", "🎉", "😕", "❤️", "🚀", "👀"].map(emoji => {
-            return t.button({onClick: () => this._vm.react(emoji)}, emoji);
+            return t.button({ onClick: () => this._vm.react(emoji) }, emoji);
         });
-        const customButton = t.button({onClick: () => {
-            const key = prompt("Enter your reaction (emoji)");
-            if (key) {
-                this._vm.react(key);
+        const customButton = t.button({
+            onClick: () => {
+                const key = prompt("Enter your reaction (emoji)");
+                if (key) {
+                    this._vm.react(key);
+                }
             }
-        }}, "…");
-        return t.li({className: "quick-reactions"}, [...emojiButtons, customButton]);
+        }, "…");
+        return t.li({ className: "quick-reactions" }, [...emojiButtons, customButton]);
     }
 }

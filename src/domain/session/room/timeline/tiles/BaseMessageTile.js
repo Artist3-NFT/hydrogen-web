@@ -23,6 +23,7 @@ export class BaseMessageTile extends SimpleTile {
         super(entry, options);
         this._date = this._entry.timestamp ? new Date(this._entry.timestamp) : null;
         this._isContinuation = false;
+        this._isSameDay = false;
         this._reactions = null;
         this._replyTile = null;
         if (this._entry.annotations || this._entry.pendingAnnotations) {
@@ -79,7 +80,7 @@ export class BaseMessageTile extends SimpleTile {
     }
 
     get date() {
-        return this._date && this._date.toLocaleDateString({}, {month: "numeric", day: "numeric"}).split('/').join('-');
+        return this._date && this._date.toLocaleDateString('en-US', {year: 'numeric', month: "long", day: "numeric"}).split('/').join('-');
     }
 
     get time() {
@@ -92,6 +93,10 @@ export class BaseMessageTile extends SimpleTile {
 
     get isContinuation() {
         return this._isContinuation;
+    }
+    
+    get isSameDay() {
+        return this._isSameDay;
     }
 
     get isUnverified() {
@@ -119,6 +124,10 @@ export class BaseMessageTile extends SimpleTile {
         if (isContinuation !== this._isContinuation) {
             this._isContinuation = isContinuation;
             this.emitChange("isContinuation");
+        }
+        if (prev && prev instanceof BaseMessageTile && prev.date === this.date) {
+            this._isSameDay = true;
+            this.emitChange("isSameDay");
         }
     }
 

@@ -32,6 +32,7 @@ limitations under the License.
 .Timeline_message {
     display: grid;
     grid-template:
+        "dtime dtime" auto
         "avatar sender" auto
         "avatar body" auto
         "time   body" 1fr
@@ -43,6 +44,14 @@ limitations under the License.
     /* TODO: check whether this is needed for .media to maintain aspect ratio (on IE11) like the 100% above */
     /* width: 100%; */
     box-sizing: border-box;
+}
+
+.Timeline_message .timeTitle {
+    grid-area: dtime;
+    display: none;
+}
+.newDay .timeTitle {
+    display: flex !important;
 }
 
 .Timeline_message:not(.continuation) {
