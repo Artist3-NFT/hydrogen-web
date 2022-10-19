@@ -65,6 +65,7 @@ export class MediaRepository {
         newDownloader.setAttribute('href', `${urlObj.pathname}`)
         newDownloader.setAttribute('style', 'display: none')
         newDownloader.setAttribute('target', '_blank')
+        newDownloader.setAttribute('download', '')
         document.body.appendChild(newDownloader)
         newDownloader.click()
     }
