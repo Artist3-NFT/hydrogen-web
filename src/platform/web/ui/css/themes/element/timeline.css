@@ -28,6 +28,9 @@ limitations under the License.
     background-repeat: no-repeat;
     cursor: pointer;
 }
+.ReplyPreviewView .Timeline_message {
+    max-width: 100%;
+}
 
 .Timeline_message {
     display: grid;
@@ -37,21 +40,63 @@ limitations under the License.
         "avatar body" auto
         "time   body" 1fr
         "time   reactions" auto /
-         30px   1fr;
+        48px 1fr;
     column-gap: 8px;
     padding: 4px;
-    margin: 0 12px;
     /* TODO: check whether this is needed for .media to maintain aspect ratio (on IE11) like the 100% above */
     /* width: 100%; */
+    max-width: 60%;
     box-sizing: border-box;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: auto;
+    margin-left: 20px;
+    width: fit-content;
+    position: relative;
+}
+.Timeline_message.newDay {
+    margin-top: 40px !important;
+    margin-bottom: 0px;
+}
+.Timeline_message.own {
+    margin-left: auto;
+    margin-right: 20px;
+}
+.Timeline_message .datetimeAtEnd {
+    display: none;
+}
+.Timeline_message .ReplyPreviewView .datetimeAtEnd {
+    display: inline-block;
+}
+
+.Timeline_message.own .Timeline_messageSender{
+    display: none;
+}
+
+.Timeline_message.own .Timeline_messageAvatar {
+    display: none;
+}
+
+.ReplyPreviewView .timeTitle,.continuation .timeTitle {
+    display: none !important;
+}
+
+.Timeline_message.own {
+    /* text-align: right; */
 }
 
 .Timeline_message .timeTitle {
     grid-area: dtime;
     display: none;
 }
+
 .newDay .timeTitle {
-    display: flex !important;
+    display: flex;
+    grid-area: dtime;
+    position: absolute;
+    left: 50%;
+    top: -30px;
+    width: 300px;
 }
 
 .Timeline_message:not(.continuation) {
@@ -76,7 +121,7 @@ limitations under the License.
             "body      body" 1fr
             "time      time" auto
             "reactions reactions" auto /
-             30px 1fr;
+            48px 1fr;
     }
 
     .Timeline_messageSender {
@@ -85,14 +130,16 @@ limitations under the License.
     }
 }
 
-.Timeline_message:hover:not(.disabled), .Timeline_message.selected, .Timeline_message.menuOpen {
+.Timeline_message:hover:not(.disabled),
+.Timeline_message.selected,
+.Timeline_message.menuOpen {
     /* needs transparency support */
     background-color: rgba(141, 151, 165, 0.1);
     border-radius: 4px;
 }
 
-.Timeline_message:hover > .Timeline_messageOptions,
-.Timeline_message.menuOpen > .Timeline_messageOptions {
+.Timeline_message:hover>.Timeline_messageOptions,
+.Timeline_message.menuOpen>.Timeline_messageOptions {
     display: block;
     user-select: none;
 }
@@ -101,6 +148,8 @@ limitations under the License.
     grid-area: avatar;
     cursor: pointer;
     text-decoration: none;
+    width: 40px;
+    height: 40px;
 }
 
 .Timeline_messageSender {
@@ -109,11 +158,12 @@ limitations under the License.
     line-height: 1.7rem;
 }
 
-.Timeline_messageSender, .Timeline_messageBody {
+.Timeline_messageSender,
+.Timeline_messageBody {
     /* reset body margin */
     margin: 0;
     /* first try break-all, then break-word, which isn't supported everywhere */
-    word-break: break-all;  
+    word-break: break-all;
     word-break: break-word;
 }
 
@@ -151,7 +201,8 @@ limitations under the License.
     user-select: none;
 }
 
-.Timeline_messageBody time, .Timeline_messageTime {
+.Timeline_messageBody time,
+.Timeline_messageTime {
     font-size: 0.8em;
     line-height: normal;
     color: var(--timeline-time-text-color);
@@ -171,14 +222,37 @@ limitations under the License.
     min-width: 0;
 }
 
-.hydrogen .Timeline_messageSender.usercolor1 { color: var(--usercolor1); }
-.hydrogen .Timeline_messageSender.usercolor2 { color: var(--usercolor2); }
-.hydrogen .Timeline_messageSender.usercolor3 { color: var(--usercolor3); }
-.hydrogen .Timeline_messageSender.usercolor4 { color: var(--usercolor4); }
-.hydrogen .Timeline_messageSender.usercolor5 { color: var(--usercolor5); }
-.hydrogen .Timeline_messageSender.usercolor6 { color: var(--usercolor6); }
-.hydrogen .Timeline_messageSender.usercolor7 { color: var(--usercolor7); }
-.hydrogen .Timeline_messageSender.usercolor8 { color: var(--usercolor8); }
+.hydrogen .Timeline_messageSender.usercolor1 {
+    color: var(--usercolor1);
+}
+
+.hydrogen .Timeline_messageSender.usercolor2 {
+    color: var(--usercolor2);
+}
+
+.hydrogen .Timeline_messageSender.usercolor3 {
+    color: var(--usercolor3);
+}
+
+.hydrogen .Timeline_messageSender.usercolor4 {
+    color: var(--usercolor4);
+}
+
+.hydrogen .Timeline_messageSender.usercolor5 {
+    color: var(--usercolor5);
+}
+
+.hydrogen .Timeline_messageSender.usercolor6 {
+    color: var(--usercolor6);
+}
+
+.hydrogen .Timeline_messageSender.usercolor7 {
+    color: var(--usercolor7);
+}
+
+.hydrogen .Timeline_messageSender.usercolor8 {
+    color: var(--usercolor8);
+}
 
 .Timeline_messageBody h1,
 .Timeline_messageBody h2,
@@ -190,12 +264,29 @@ limitations under the License.
     margin: 0.7em 0;
 }
 
-.Timeline_messageBody h1 { font-size: 1.6em; }
-.Timeline_messageBody h2 { font-size: 1.5em; }
-.Timeline_messageBody h3 { font-size: 1.4em; }
-.Timeline_messageBody h4 { font-size: 1.3em; }
-.Timeline_messageBody h5 { font-size: 1.2em; }
-.Timeline_messageBody h6 { font-size: 1.1em; }
+.Timeline_messageBody h1 {
+    font-size: 1.6em;
+}
+
+.Timeline_messageBody h2 {
+    font-size: 1.5em;
+}
+
+.Timeline_messageBody h3 {
+    font-size: 1.4em;
+}
+
+.Timeline_messageBody h4 {
+    font-size: 1.3em;
+}
+
+.Timeline_messageBody h5 {
+    font-size: 1.2em;
+}
+
+.Timeline_messageBody h6 {
+    font-size: 1.1em;
+}
 
 .Timeline_messageBody a {
     word-break: break-all;
@@ -212,7 +303,7 @@ limitations under the License.
     width: 100%;
 }
 
-.Timeline_messageBody .media > a {
+.Timeline_messageBody .media>a {
     text-decoration: none;
     width: 100%;
     display: block;
@@ -220,12 +311,13 @@ limitations under the License.
 
 /* .spacer grows with an inline padding-top to the size of the image,
 so the timeline doesn't jump when the image loads */
-.Timeline_messageBody .media > * {
+.Timeline_messageBody .media>* {
     grid-row: 1;
     grid-column: 1;
 }
 
-.Timeline_messageBody .media img, .Timeline_messageBody .media video {
+.Timeline_messageBody .media img,
+.Timeline_messageBody .media video {
     width: 100%;
     height: auto;
     /* for IE11 to still scale even though the spacer is too tall */
@@ -243,25 +335,25 @@ only loads when the top comes into view*/
     align-self: stretch;
 }
 
-.Timeline_messageBody .media > .status {
+.Timeline_messageBody .media>.status {
     align-self: end;
     justify-self: start;
     font-size: 0.8em;
 }
 
-.Timeline_messageBody .media > progress {
+.Timeline_messageBody .media>progress {
     align-self: center;
     justify-self: center;
     width: 75%;
 }
 
-.Timeline_messageBody .media > time {
+.Timeline_messageBody .media>time {
     align-self: end;
     justify-self: end;
 }
 
-.Timeline_messageBody .media > time,
-.Timeline_messageBody .media > .status {
+.Timeline_messageBody .media>time,
+.Timeline_messageBody .media>.status {
     color: var(--text-color);
     display: block;
     padding: 2px;
@@ -271,14 +363,15 @@ only loads when the top comes into view*/
     border-radius: 4px;
 }
 
-.Timeline_messageBody .media > .spacer {
+.Timeline_messageBody .media>.spacer {
     /* TODO: can we implement this with a pseudo element? or perhaps they are not grid items? */
     width: 100%;
     /* don't stretch height as it is a spacer, just in case it doesn't match with image height */
     align-self: start;
 }
 
-.Timeline_messageBody code, .Timeline_messageBody pre {
+.Timeline_messageBody code,
+.Timeline_messageBody pre {
     background-color: var(--background-color-secondary);
     font-family: monospace;
     font-size: 0.9em;
@@ -320,7 +413,8 @@ only loads when the top comes into view*/
     border-bottom: 1px solid var(--background-color-secondary--darker-15);
 }
 
-.Timeline_messageBody td, .Timeline_messageBody th {
+.Timeline_messageBody td,
+.Timeline_messageBody th {
     padding: 2px 5px 2px 5px;
 }
 
@@ -413,7 +507,7 @@ only loads when the top comes into view*/
     padding: 5px 10%;
 }
 
-.AnnouncementView > div {
+.AnnouncementView>div {
     margin: 0 auto;
     padding: 10px 20px;
     background-color: var(--background-color-secondary);
@@ -421,7 +515,7 @@ only loads when the top comes into view*/
     border-radius: 10px;
 }
 
-.GapView > :not(:first-child) {
+.GapView> :not(:first-child) {
     margin-left: 12px;
 }
 

@@ -66,7 +66,7 @@ export class BaseMessageView extends TemplateView {
                 li.removeChild(li.querySelector(".Timeline_messageAvatar"));
                 li.removeChild(li.querySelector(".Timeline_messageSender"));
             } else if (!isContinuation && !this._isReplyPreview) {
-                const avatar = tag.div({ 'data-href': vm.memberPanelLink, className: "Timeline_messageAvatar" }, [renderStaticAvatar(vm, 30)]);
+                const avatar = tag.div({ 'data-href': vm.memberPanelLink, className: "Timeline_messageAvatar" }, [renderStaticAvatar(vm, 40)]);
                 const sender = tag.div({ className: `Timeline_messageSender usercolor${vm.avatarColorNumber}` }, vm.displayName);
                 li.insertBefore(avatar, li.firstChild);
                 li.insertBefore(sender, li.firstChild);
@@ -87,6 +87,9 @@ export class BaseMessageView extends TemplateView {
                 reactionsView = null;
             }
         });
+        // const parentNode = li.parentNode
+        // console.log('parentNode:', parentNode)
+        // parentNode.insertBefore(parentNode, parentNode.children[0])
         li.appendChild(timeTitle)
         return li;
     }
