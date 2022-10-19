@@ -28,6 +28,7 @@ limitations under the License.
     background-repeat: no-repeat;
     cursor: pointer;
 }
+
 .ReplyPreviewView .Timeline_message {
     max-width: 100%;
 }
@@ -40,40 +41,45 @@ limitations under the License.
         "avatar body" auto
         "time   body" 1fr
         "time   reactions" auto /
-        48px 1fr;
-    column-gap: 8px;
+        50px 1fr;
+    column-gap: 10px;
     padding: 4px;
     /* TODO: check whether this is needed for .media to maintain aspect ratio (on IE11) like the 100% above */
     /* width: 100%; */
     max-width: 60%;
     box-sizing: border-box;
-    margin-top: 0px;
+    margin-top: 8px;
     margin-bottom: 0px;
     margin-right: auto;
     margin-left: 20px;
     width: fit-content;
     position: relative;
 }
+
 .Timeline_message.newDay {
     margin-top: 40px !important;
     margin-bottom: 0px;
 }
+
 .ReplyPreviewView .Timeline_message.newDay {
-    margin-top: 0px !important;
+    margin-top: 8px !important;
     margin-bottom: 0px;
 }
+
 .Timeline_message.own {
     margin-left: auto;
     margin-right: 20px;
 }
+
 .Timeline_message .datetimeAtEnd {
     display: none;
 }
+
 .Timeline_message .ReplyPreviewView .datetimeAtEnd {
     display: inline-block;
 }
 
-.Timeline_message.own .Timeline_messageSender{
+.Timeline_message.own .Timeline_messageSender {
     display: none;
 }
 
@@ -81,7 +87,8 @@ limitations under the License.
     display: none;
 }
 
-.ReplyPreviewView .timeTitle,.continuation .timeTitle {
+.ReplyPreviewView .timeTitle,
+.continuation .timeTitle {
     display: none !important;
 }
 
