@@ -58,6 +58,10 @@ limitations under the License.
     margin-top: 40px !important;
     margin-bottom: 0px;
 }
+.ReplyPreviewView .Timeline_message.newDay {
+    margin-top: 0px !important;
+    margin-bottom: 0px;
+}
 .Timeline_message.own {
     margin-left: auto;
     margin-right: 20px;
