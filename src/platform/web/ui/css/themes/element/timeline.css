@@ -44,19 +44,17 @@ limitations under the License.
         50px 1fr;
     column-gap: 10px;
     padding: 4px;
-    /* TODO: check whether this is needed for .media to maintain aspect ratio (on IE11) like the 100% above */
-    /* width: 100%; */
     max-width: 60%;
     box-sizing: border-box;
     margin-top: 8px;
     margin-bottom: 0px;
     margin-right: auto;
-    margin-left: 20px;
+    margin-left: 0px;
     width: fit-content;
     position: relative;
 }
 
-.Timeline_message.newDay {
+.Timeline_message.newDay:not(.continuation) {
     margin-top: 40px !important;
     margin-bottom: 0px;
 }
