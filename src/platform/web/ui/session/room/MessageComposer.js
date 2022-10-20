@@ -163,6 +163,7 @@ export class MessageComposer extends TemplateView {
                 Menu.option(vm.i18n`Video`, () => vm.sendVideo()).setIcon("video"),
                 Menu.option(vm.i18n`Photo`, () => vm.sendPicture()).setIcon("picture"),
                 Menu.option(vm.i18n`Document`, () => vm.sendFile()).setIcon("file"),
+                Menu.option(vm.i18n`Token`, () => {}).setIcon("token"),
             ], 'bottom-menu'));
             this._attachmentPopup.trackInTemplateView(this);
             this._attachmentPopup.showRelativeTo(evt.target, 12);

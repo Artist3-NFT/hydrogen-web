@@ -54,8 +54,8 @@ limitations under the License.
     position: relative;
 }
 
-.Timeline_message.newDay:not(.continuation) {
-    margin-top: 40px !important;
+.Timeline_message.newDay:not(.continuation):not(.disabled) {
+    margin-top: 62px !important;
     margin-bottom: 0px;
 }
 
@@ -104,7 +104,7 @@ limitations under the License.
     grid-area: dtime;
     position: absolute;
     left: 50%;
-    top: -30px;
+    top: -52px;
     width: 300px;
 }
 
@@ -123,7 +123,7 @@ limitations under the License.
     margin-top: 0;
 }
 
-@media screen and (max-width: 800px) {
+/* @media screen and (max-width: 800px) {
     .Timeline_message {
         grid-template:
             "avatar    sender" auto
@@ -137,7 +137,7 @@ limitations under the License.
         margin-top: 0 !important;
         align-self: center;
     }
-}
+} */
 
 .Timeline_message:hover:not(.disabled),
 .Timeline_message.selected,
@@ -581,4 +581,61 @@ only loads when the top comes into view*/
 
 .GapView.isAtTop {
     padding: 52px 20px 12px 20px;
+}
+.file-message .file-card {
+    height: 48px;
+    padding: 0 8px;
+    width: 300px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+.file-message .file-card .file-card-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 8px;
+    background-image: url('icons/file-card.svg?primary=icon-color');
+}
+.file-message .file-card .file-card-txt {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 4px;
+    padding-bottom: 10px;
+}
+.file-message .file-card .file-card-txt .file-card-content{
+    font-size: 12px;
+    height: 16px;
+    line-height: 16px;
+}
+.bottom-menu li.icon{
+    background-color: var(--icon-background);
+    background-size: 24px 24px;
+    background-repeat: no-repeat;
+    background-position: left 8% center;
+    width: 155px;
+    height: 52px;
+    margin-bottom: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-bottom: 1px solid rgba(207, 217, 232, 0.4);
+}
+.bottom-menu li.icon:last-of-type{
+    border-bottom: none;
+}
+.bottom-menu li.icon .menu-item{
+    height: 52px;
+    padding: 0 0 0 32px;
+}
+.bottom-menu li.icon.picture{
+    background-image: url("./icons/image.svg?primary=icon-color");
+}
+.bottom-menu li.icon.file{
+    background-image: url("./icons/file.svg?primary=icon-color");
+}
+.bottom-menu li.icon.token{
+    background-image: url("./icons/token.svg?primary=icon-color");
 }
