@@ -160,10 +160,10 @@ export class MessageComposer extends TemplateView {
         } else {
             const vm = this.value;
             this._attachmentPopup = new Popup(new Menu([
-                Menu.option(vm.i18n`Send video`, () => vm.sendVideo()).setIcon("video"),
-                Menu.option(vm.i18n`Send picture`, () => vm.sendPicture()).setIcon("picture"),
-                Menu.option(vm.i18n`Send file`, () => vm.sendFile()).setIcon("file"),
-            ]));
+                Menu.option(vm.i18n`Video`, () => vm.sendVideo()).setIcon("video"),
+                Menu.option(vm.i18n`Photo`, () => vm.sendPicture()).setIcon("picture"),
+                Menu.option(vm.i18n`Document`, () => vm.sendFile()).setIcon("file"),
+            ], 'bottom-menu'));
             this._attachmentPopup.trackInTemplateView(this);
             this._attachmentPopup.showRelativeTo(evt.target, 12);
         }

@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 import { renderStaticAvatar } from "../../../avatar";
 import { tag } from "../../../general/html";
 import { mountView } from "../../../general/utils";
@@ -42,7 +41,17 @@ export class BaseMessageView extends TemplateView {
         timeTitle.appendChild(timeTitleTimer)
         const children = [this.renderMessageBody(t, vm)];
         if (this._interactive) {
-            children.push(t.button({ className: "Timeline_messageOptions" }, "⋯"));
+            const hoverer = t.div({ className: 'Timeline_messageOptions2' });
+            const hoveree1 = t.div({ className: 'hover-btn emoji', onClick: (e) => this._toggleEmojiMenu(e.target, vm) });
+            const hoveree2 = t.div({ className: 'hover-btn reply', onClick: () => vm.startReply() });
+            const hoveree3 = t.div({ className: 'hover-btn thread', onClick: () => { } });
+            const hoveree4 = t.div({ className: 'hover-btn more', onClick: (e) => this._toggleMenuMore(e.target, vm) });
+            hoverer.appendChild(hoveree1)
+            hoverer.appendChild(hoveree2)
+            hoverer.appendChild(hoveree3)
+            hoverer.appendChild(hoveree4)
+            children.push(hoverer);
+            // children.push(t.button({ className: "Timeline_messageOptions" }, "⋯"));
         }
         const li = t.el(this._tagName, {
             className: {
@@ -105,29 +114,54 @@ export class BaseMessageView extends TemplateView {
         if (this._menuPopup && this._menuPopup.isOpen) {
             this._menuPopup.close();
         } else {
-            const options = this.createMenuOptions(this.value);
+            const options = this.createMenuOptions(this.value, button);
             if (!options.length) {
                 return;
             }
             this.root().classList.add("menuOpen");
             const onClose = () => this.root().classList.remove("menuOpen");
-            this._menuPopup = new Popup(new Menu(options), onClose);
+            this._menuPopup = new Popup(new Menu(options, 'msg-hover'), onClose);
             this._menuPopup.trackInTemplateView(this);
             this._menuPopup.showRelativeTo(button, 2);
         }
     }
+    _toggleEmojiMenu(button, vm) {
+        const options = [];
+        options.push(new QuickReactionsMenuOption(vm))
+        this.root().classList.add("menuOpen");
+        const onClose = () => this.root().classList.remove("menuOpen");
+        this._menuPopup = new Popup(new Menu(options, 'msg-hover'), onClose);
+        this._menuPopup.trackInTemplateView(this);
+        this._menuPopup.showRelativeTo(button, 2);
+    }
+    _toggleMenuMore(button, vm) {
+        const options = [];
+        options.push(Menu.option(vm.i18n`Pin message`, () => { }).setIcon('msg-menu-more-pin'));
+        options.push(Menu.option(vm.i18n`Reply`, () => vm.startReply()).setIcon('msg-menu-more-reply'));
+        options.push(Menu.option(vm.i18n`Create thread`, () => { }).setIcon('msg-menu-more-thread'));
+        options.push(Menu.option(vm.i18n`Copy message link`, () => { }).setIcon('msg-menu-more-cp-link'));
+        options.push(Menu.option(vm.i18n`Delete channel`, () => { }).setIcon('msg-menu-more-del'));
+        this.root().classList.add("menuOpen");
+        const onClose = () => this.root().classList.remove("menuOpen");
+        this._menuPopup = new Popup(new Menu(options, 'msg-vertical'), onClose);
+        this._menuPopup.trackInTemplateView(this);
+        this._menuPopup.showRelativeTo(button, 2);
+    }
 
-    createMenuOptions(vm) {
+    createMenuOptions(vm, target) {
         const options = [];
         if (vm.canReact && vm.shape !== "redacted" && !vm.isPending) {
-            options.push(new QuickReactionsMenuOption(vm));
-            options.push(Menu.option(vm.i18n`Reply`, () => vm.startReply()));
+            options.push(Menu.option(vm.i18n``, () => this._toggleEmojiMenu(target, vm)).setIcon('emoji'));
+            // options.push(new QuickReactionsMenuOption(vm));
+            options.push(Menu.option(vm.i18n``, () => vm.startReply()).setIcon('reply'));
         }
-        if (vm.canAbortSending) {
-            options.push(Menu.option(vm.i18n`Cancel`, () => vm.abortSending()));
-        } else if (vm.canRedact) {
-            options.push(Menu.option(vm.i18n`Delete`, () => vm.redact()).setDestructive());
-        }
+        options.push(Menu.option(vm.i18n``, () => { }).setIcon('thread'));
+        options.push(Menu.option(vm.i18n``, () => this._toggleMenuMore(target, vm)).setIcon('more'));
+        // if (vm.canAbortSending) {
+        //     options.push(Menu.option(vm.i18n`Cancel`, () => vm.abortSending()));
+        // } else if (vm.canRedact) {
+        //     options.push(Menu.option(vm.i18n`Delete`, () => vm.redact()).setDestructive());
+        // }
         return options;
     }
 
@@ -143,6 +177,7 @@ class QuickReactionsMenuOption {
             return t.button({ onClick: () => this._vm.react(emoji) }, emoji);
         });
         const customButton = t.button({
+            className: 'emoji-more',
             onClick: () => {
                 const key = prompt("Enter your reaction (emoji)");
                 if (key) {

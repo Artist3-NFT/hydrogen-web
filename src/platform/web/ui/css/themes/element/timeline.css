@@ -153,6 +153,12 @@ limitations under the License.
     user-select: none;
 }
 
+.Timeline_message:hover>.Timeline_messageOptions2,
+.Timeline_message.menuOpen>.Timeline_messageOptions2 {
+    display: block;
+    user-select: none;
+}
+
 .Timeline_messageAvatar {
     grid-area: avatar;
     cursor: pointer;
@@ -179,6 +185,47 @@ limitations under the License.
 .Timeline_message:not(.continuation) .Timeline_messageSender,
 .Timeline_message:not(.continuation) .Timeline_messageBody {
     margin-top: 4px;
+}
+
+.Timeline_messageOptions2 {
+    display: none;
+    grid-area: body;
+    align-self: start;
+    justify-self: end;
+    margin-top: -32px;
+    margin-right: 4px;
+    /* button visuals */
+    border: var(--background-color-primary--darker-10) 1px solid;
+    height: 40px;
+    width: auto;
+    background-color: var(--background-color-primary);
+    color: inherit;
+    border-radius: 0px;
+    padding: 0;
+    text-align: center;
+    line-height: 22px;
+    cursor: pointer;
+}
+
+.Timeline_messageOptions2 .hover-btn {
+    background-color: var(--icon-background);
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+}
+.Timeline_messageOptions2 .emoji {
+    background-image: url('icons/smile.svg?primary=icon-color');
+}
+.Timeline_messageOptions2 .reply {
+    background-image: url('icons/reply.svg?primary=icon-color');
+}
+.Timeline_messageOptions2 .thread {
+    background-image: url('icons/hash.svg?primary=icon-color');
+}
+.Timeline_messageOptions2 .more {
+    background-image: url('icons/more.svg?primary=icon-color');
 }
 
 .Timeline_messageOptions {

@@ -21,13 +21,14 @@ export class Menu extends TemplateView {
         return new MenuOption(label, callback);
     }
 
-    constructor(options) {
+    constructor(options, className = "") {
         super();
         this._options = options;
+        this._className = className;
     }
 
     render(t) {
-        return t.ul({className: "menu", role: "menu"}, this._options.map(o => o.toDOM(t)));
+        return t.ul({className: `menu ${this._className}`, role: "menu"}, this._options.map(o => o.toDOM(t)));
     }
 }
 

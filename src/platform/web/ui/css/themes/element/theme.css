@@ -1225,3 +1225,72 @@ button.RoomDetailsView_row::after {
     background-position: center;
     background-size: 36px;
 }
+
+.msg-hover li {
+    display: inline-block;
+    height: 40px;
+    margin-bottom: 0;
+}
+.msg-hover ,.msg-vertical {
+    border-radius: 0;
+}
+ul.menu .menu-item {
+    height: 40px;
+    line-height: 40px;
+}
+.msg-hover li.icon.emoji {
+    background-color: var(--icon-background);
+    background-image: url('icons/smile.svg?primary=icon-color');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.msg-hover li.icon.reply {
+    background-color: var(--icon-background);
+    background-image: url('icons/reply.svg?primary=icon-color');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.msg-hover li.icon.thread {
+    background-color: var(--icon-background);
+    background-image: url('icons/hash.svg?primary=icon-color');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.msg-hover li.icon.more {
+    background-color: var(--icon-background);
+    background-image: url('icons/more.svg?primary=icon-color');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.msg-hover .quick-reactions {
+    height: 32px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.menu .msg-menu-more-del .menu-item {
+    color: #FF3E00 !important;
+}
+.msg-vertical li {
+    width: 224px;
+}
+.msg-vertical li.icon {
+    background-color: var(--icon-background);
+    background-repeat: no-repeat;
+    background-position: right 6% bottom 10%;
+}
+.msg-vertical li.icon.msg-menu-more-pin {
+    background-image: url('icons/pin.svg?primary=icon-color');
+}
+.msg-vertical li.icon.msg-menu-more-reply {
+    background-image: url('icons/reply.svg?primary=icon-color');
+}
+.msg-vertical li.icon.msg-menu-more-thread {
+    background-image: url('icons/hash.svg?primary=icon-color');
+}
+.msg-vertical li.icon.msg-menu-more-cp-link {
+    background-image: url('icons/link-3.svg?primary=icon-color');
+}
+.msg-vertical li.icon.msg-menu-more-del {
+    background-image: url('icons/delete.svg');
+}
