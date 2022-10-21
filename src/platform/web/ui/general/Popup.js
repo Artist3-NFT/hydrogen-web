@@ -116,7 +116,7 @@ export class Popup {
             // show top
             this._popup.style.top = `${targetPosition.top - popupHeight - this._verticalPadding}px`;
         } else {
-            return false;
+            this._popup.style.top = `${targetPosition.top - popupHeight - this._verticalPadding}px`;
         }
         if (viewport.right >= targetPosition.right + popupWidth) {
             // show right
@@ -125,7 +125,7 @@ export class Popup {
             // show left
             this._popup.style.left = `${targetPosition.right - popupWidth}px`;
         } else {
-            return false;
+            this._popup.style.left = `${targetPosition.right - popupWidth}px`;
         }
         return true;
     }
