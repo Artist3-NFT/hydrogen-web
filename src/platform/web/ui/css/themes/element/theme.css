@@ -1278,6 +1278,7 @@ button.RoomDetailsView_row::after {
 
 .msg-hover,
 .msg-vertical {
+    background-color: var(--icon-background);
     border-radius: 0;
 }
 
