@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {MEGOLM_ALGORITHM} from "../e2ee/common.js";
+import { MEGOLM_ALGORITHM } from "../e2ee/common.js";
 
 
 function applyTimelineEntries(data, timelineEntries, isInitialSync, canMarkUnread, ownUserId) {
@@ -81,7 +81,7 @@ function processNotificationCounts(data, unreadNotifications) {
         data.notificationCount = notificationCount;
     }
     return data;
-} 
+}
 
 function processRoomAccountData(data, event) {
     if (event?.type === "m.tag") {
@@ -150,6 +150,7 @@ function processTimelineEvent(data, eventEntry, isInitialSync, canMarkUnread, ow
             data = data.cloneIfNeeded();
             data.lastMessageTimestamp = eventEntry.timestamp;
             data.lastMessageContent = eventEntry.content?.body || '';
+            data.lastMessageContent = data.lastMessageContent.substring(data.lastMessageContent.lastIndexOf('\n\n'))
         }
         if (!isInitialSync && eventEntry.sender !== ownUserId && canMarkUnread) {
             data = data.cloneIfNeeded();
@@ -247,10 +248,10 @@ export class SummaryData {
 }
 
 export class RoomSummary {
-	constructor(roomId) {
+    constructor(roomId) {
         this._data = null;
         this.applyChanges(new SummaryData(null, roomId));
-	}
+    }
 
     get data() {
         return this._data;
@@ -279,12 +280,12 @@ export class RoomSummary {
         return data;
     }
 
-	writeData(data, txn) {
-		if (data !== this._data) {
+    writeData(data, txn) {
+        if (data !== this._data) {
             txn.roomSummary.set(data.serialize());
             return data;
-		}
-	}
+        }
+    }
 
     /** move summary to archived store when leaving the room */
     writeArchivedData(data, txn) {
@@ -319,9 +320,9 @@ export class RoomSummary {
         this._data.cloned = false;
     }
 
-	async load(summary) {
+    async load(summary) {
         this.applyChanges(new SummaryData(summary));
-	}
+    }
 }
 
 export function tests() {
