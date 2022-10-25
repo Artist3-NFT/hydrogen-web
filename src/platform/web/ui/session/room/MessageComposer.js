@@ -70,12 +70,13 @@ export class MessageComposer extends TemplateView {
                 title: vm.i18n`Pick attachment`,
                 onClick: evt => this._toggleAttachmentMenu(evt),
             }, vm.i18n`Send file`),
-            this._input,
-            // t.button({
-            //     className: "send",
-            //     title: vm.i18n`Send`,
-            //     onClick: () => this._trySend(),
-            // }, vm.i18n`Send`),
+            t.div({className: 'MessageComposer_input_container'}, [
+                this._input,
+                t.button({
+                    className: "send",
+                    onClick: () => this._trySend(),
+                }),
+            ])
         ]);
         return t.div({
             className: {
@@ -144,7 +145,7 @@ export class MessageComposer extends TemplateView {
                 onEmojiSelect: (e) => this.onEmojiSelect(e, ipt, vm),
                 onClickOutside: (e) => this.closeEmoji(event, this._EmkojiPicker)
             })
-    
+
             document.body.appendChild(this._EmkojiPicker)
         } else {
             if (this._EmkojiPicker.style.display === 'none') {
@@ -163,7 +164,7 @@ export class MessageComposer extends TemplateView {
                 Menu.option(vm.i18n`Video`, () => vm.sendVideo()).setIcon("video"),
                 Menu.option(vm.i18n`Photo`, () => vm.sendPicture()).setIcon("picture"),
                 Menu.option(vm.i18n`Document`, () => vm.sendFile()).setIcon("file"),
-                Menu.option(vm.i18n`Token`, () => {}).setIcon("token"),
+                Menu.option(vm.i18n`Token`, () => { }).setIcon("token"),
             ], 'bottom-menu'));
             this._attachmentPopup.trackInTemplateView(this);
             this._attachmentPopup.showRelativeTo(evt.target, 12);
