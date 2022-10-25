@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {tag} from "./html";
+import { tag } from "./html";
 
 export class Popup {
     constructor(view, closeCallback = null) {
@@ -31,7 +31,7 @@ export class Popup {
         const appContainer = this._target.closest(".hydrogen");
         let popupContainer = appContainer.querySelector(".popupContainer");
         if (!popupContainer) {
-            popupContainer = tag.div({className: "popupContainer"});
+            popupContainer = tag.div({ className: "popupContainer" });
             appContainer.appendChild(popupContainer);
         }
         return popupContainer;
@@ -83,7 +83,7 @@ export class Popup {
 
     handleEvent(evt) {
         if (evt.type === "scroll") {
-            if(!this._position()) {
+            if (!this._position()) {
                 this.close();
             }
         } else if (evt.type === "click") {
@@ -101,14 +101,15 @@ export class Popup {
         const popupHeight = this._popup.clientHeight;
         const viewport = (this._scroller ? this._scroller : document.documentElement).getBoundingClientRect();
 
-        if (
-            targetPosition.top > viewport.bottom ||
-            targetPosition.left > viewport.right ||
-            targetPosition.bottom < viewport.top ||
-            targetPosition.right < viewport.left
-        ) {
-            return false;
-        }
+        // if (
+        //     targetPosition.top > viewport.bottom ||
+        //     targetPosition.left > viewport.right ||
+        //     targetPosition.bottom < viewport.top ||
+        //     targetPosition.right < viewport.left
+        // ) {
+        //     this._popup.style.left = '68px';
+        //     return false;
+        // }
         if (viewport.bottom >= targetPosition.bottom + popupHeight) {
             // show below
             this._popup.style.top = `${targetPosition.bottom + this._verticalPadding}px`;
@@ -123,9 +124,17 @@ export class Popup {
             this._popup.style.left = `${targetPosition.left}px`;
         } else if (viewport.left <= targetPosition.left - popupWidth) {
             // show left
-            this._popup.style.left = `${targetPosition.right - popupWidth}px`;
+            if ((targetPosition.right - popupWidth) < 0) {
+                this._popup.style.left = '0px';
+            } else {
+                this._popup.style.left = `${targetPosition.right - popupWidth}px`;
+            }
         } else {
-            this._popup.style.left = `${targetPosition.right - popupWidth}px`;
+            if ((targetPosition.right - popupWidth) < 0) {
+                this._popup.style.left = '0px';
+            } else {
+                this._popup.style.left = `${targetPosition.right - popupWidth}px`;
+            }
         }
         return true;
     }
@@ -144,7 +153,7 @@ export class Popup {
         this.close();
     }
 
-    update() {}
+    update() { }
 }
 
 function findScrollParent(el) {
