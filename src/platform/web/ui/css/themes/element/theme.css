@@ -724,6 +724,7 @@ a {
     white-space: nowrap;
     overflow: hidden;
     background-image: url('icons/smile.svg?primary=icon-color');
+    background-color: transparent;
     background-repeat: no-repeat;
     background-position: center;
 }
