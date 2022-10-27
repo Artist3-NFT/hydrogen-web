@@ -41,16 +41,18 @@ export class BaseMessageView extends TemplateView {
         timeTitle.appendChild(timeTitleTimer)
         const children = [this.renderMessageBody(t, vm)];
         if (this._interactive) {
-            const hoverer = t.div({ className: 'Timeline_messageOptions2' });
-            const hoveree1 = t.div({ className: 'hover-btn emoji', onClick: (e) => this._toggleEmojiMenu(e.target, vm) });
-            const hoveree2 = t.div({ className: 'hover-btn reply', onClick: () => vm.startReply() });
-            const hoveree3 = t.div({ className: 'hover-btn thread', onClick: () => { } });
-            const hoveree4 = t.div({ className: 'hover-btn more', onClick: (e) => this._toggleMenuMore(e.target, vm) });
-            hoverer.appendChild(hoveree1)
-            hoverer.appendChild(hoveree2)
-            hoverer.appendChild(hoveree3)
-            hoverer.appendChild(hoveree4)
-            children.push(hoverer);
+            // const hoverer = t.div({ className: 'Timeline_messageOptions2' });
+            // const hoveree1 = t.div({ className: 'hover-btn emoji', onClick: (e) => this._toggleEmojiMenu(e.target, vm) });
+            // const hoveree2 = t.div({ className: 'hover-btn reply', onClick: () => vm.startReply() });
+            // const hoveree3 = t.div({ className: 'hover-btn thread', onClick: () => { } });
+            // const hoveree4 = t.div({ className: 'hover-btn more', onClick: (e) => this._toggleMenuMore(e.target, vm) });
+            // hoverer.appendChild(hoveree1)
+            // hoverer.appendChild(hoveree2)
+            // hoverer.appendChild(hoveree3)
+            // hoverer.appendChild(hoveree4)
+            // children.push(hoverer);
+            const dropDownAnchor = t.div({ className: 'Timeline_messageOptions3', onClick: (e) => this._toggleMenuMore(e.target, vm) });
+            children.push(dropDownAnchor);
             // children.push(t.button({ className: "Timeline_messageOptions" }, "⋯"));
         }
         const li = t.el(this._tagName, {
@@ -138,9 +140,12 @@ export class BaseMessageView extends TemplateView {
         const options = [];
         options.push(Menu.option(vm.i18n`Pin message`, () => { }).setIcon('msg-menu-more-pin'));
         options.push(Menu.option(vm.i18n`Reply`, () => vm.startReply()).setIcon('msg-menu-more-reply'));
+        options.push(Menu.option(vm.i18n`Add reaction`, () => this._toggleEmojiMenu(button, vm)).setIcon('msg-menu-more-emoji'));
         options.push(Menu.option(vm.i18n`Create thread`, () => { }).setIcon('msg-menu-more-thread'));
         options.push(Menu.option(vm.i18n`Copy message link`, () => { }).setIcon('msg-menu-more-cp-link'));
-        options.push(Menu.option(vm.i18n`Delete channel`, () => { }).setIcon('msg-menu-more-del'));
+        if (vm.canRedact) {
+            options.push(Menu.option(vm.i18n`Delete message`, () => vm.redact()).setDestructive().setIcon('msg-menu-more-del'));
+        }
         this.root().classList.add("menuOpen");
         const onClose = () => this.root().classList.remove("menuOpen");
         this._menuPopup = new Popup(new Menu(options, 'msg-vertical'), onClose);

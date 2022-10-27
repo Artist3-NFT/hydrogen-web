@@ -40,6 +40,7 @@ export class MessageComposer extends TemplateView {
                     this._clearHeight();
                 }
             },
+            id: 'main_input',
             placeholder: vm => vm.isEncrypted ? "Send an encrypted message…" : "Send a message…",
             rows: "1"
         });
@@ -73,6 +74,7 @@ export class MessageComposer extends TemplateView {
             t.div({className: 'MessageComposer_input_container'}, [
                 this._input,
                 t.button({
+                    id: 'main_send_button',
                     className: "send",
                     onClick: () => this._trySend(),
                 }),

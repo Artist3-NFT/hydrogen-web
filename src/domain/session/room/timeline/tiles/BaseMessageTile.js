@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {SimpleTile} from "./SimpleTile.js";
-import {ReactionsViewModel} from "../ReactionsViewModel.js";
-import {getIdentifierColorNumber, avatarInitials, getAvatarHttpUrl} from "../../../../avatar";
+import { SimpleTile } from "./SimpleTile.js";
+import { ReactionsViewModel } from "../ReactionsViewModel.js";
+import { getIdentifierColorNumber, avatarInitials, getAvatarHttpUrl } from "../../../../avatar";
 
 export class BaseMessageTile extends SimpleTile {
     constructor(entry, options) {
@@ -80,11 +80,11 @@ export class BaseMessageTile extends SimpleTile {
     }
 
     get date() {
-        return this._date && this._date.toLocaleDateString('en-US', {year: 'numeric', month: "long", day: "numeric"}).split('/').join('-');
+        return this._date && this._date.toLocaleDateString('en-US', { year: 'numeric', month: "long", day: "numeric" }).split('/').join('-');
     }
 
     get time() {
-        return this._date && this._date.toLocaleTimeString({}, {hour: "numeric", minute: "2-digit"});
+        return this._date && this._date.toLocaleTimeString({}, { hour: "numeric", minute: "2-digit" });
     }
 
     get isOwn() {
@@ -94,7 +94,7 @@ export class BaseMessageTile extends SimpleTile {
     get isContinuation() {
         return this._isContinuation;
     }
-    
+
     get isSameDay() {
         return this._isSameDay;
     }
@@ -125,7 +125,8 @@ export class BaseMessageTile extends SimpleTile {
             this._isContinuation = isContinuation;
             this.emitChange("isContinuation");
         }
-        if (prev && prev instanceof BaseMessageTile && prev.date === this.date) {
+        // if (prev && prev.date === this.date) {
+        if (prev && (prev instanceof BaseMessageTile) && prev.date === this.date) {
             this._isSameDay = true;
             this.emitChange("isSameDay");
         }
@@ -153,7 +154,7 @@ export class BaseMessageTile extends SimpleTile {
                     this._replyTile = new ReplyTile(replyEntry, this._options);
                 }
             }
-            if(action?.shouldUpdate) {
+            if (action?.shouldUpdate) {
                 this._replyTile?.emitChange();
             }
         }
@@ -239,7 +240,7 @@ export class BaseMessageTile extends SimpleTile {
     }
 
     _updateReactions() {
-        const {annotations, pendingAnnotations} = this._entry;
+        const { annotations, pendingAnnotations } = this._entry;
         if (!annotations && !pendingAnnotations) {
             if (this._reactions) {
                 this._reactions = null;

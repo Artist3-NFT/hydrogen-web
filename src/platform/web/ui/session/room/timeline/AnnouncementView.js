@@ -23,13 +23,42 @@ export class AnnouncementView extends TemplateView {
     }
 
     render(t) {
-        if ((this.value?.announcement || '').indexOf('@u_') >= 0) return t.div()
-        if ((this.value?.announcement || '').indexOf('gamic_admin') >= 0) return t.div()
+        const isNewDay = this.value?.isNewDay
+        const shouldHide = this.value?.shouldHide
+        const inNewDay = this.value?.inNewDay
+        const noContent = this.value?.noContent
+        const showTime = (isNewDay || inNewDay) && !noContent
 
-        const isJoining = (this.value?.announcement || '').endsWith('joined the room')
-            || (this.value?.announcement || '').indexOf('was invited to the room') >= 0
-            || (this.value?.announcement || '').endsWith('left the room') >= 0
-        return t.li({ className: isJoining ? "AnnouncementView joining" : "AnnouncementView" }, t.div(vm => vm.announcement));
+
+        const timeTitle = t.div({ className: { timeTitle: true } });
+        const timeTitleTimer = t.time({ className: {} }, this.value?.date);
+        timeTitle.appendChild(timeTitleTimer)
+
+        const showWelcome = (this.value?.announcement || '').toLocaleLowerCase().indexOf('welcome') !== -1;
+        const shouldReplace = (this.value?.announcement || '').indexOf('{userName}') !== -1;
+        return t.li({
+            className: `AnnouncementView ${showTime ? 'showTime' : ''} ${shouldHide ? 'hidden' : 'joining'}`
+        }, [
+            t.div({
+                className: 'AnnouncementView_inner'
+            }, [
+                t.div({ className: 'AnnouncementView_inner_upper' }, [
+                    t.div({ className: 'AnnouncementView_inner_upper_img' }),
+                    ...shouldReplace ? [
+                        t.div(`${(this.value?.announcement || '').replace('{userName}', ' ')}`),
+                        t.span({ style: 'margin-left: 4px;', className: `usercolor${this.value?.colorIndex}` }, `${this.value?.targetName}`)
+                    ] : [t.div(`${this.value?.announcement}`)],
+                ]),
+                t.div({ className: 'AnnouncementView_inner_below' }, showWelcome ? [
+                    t.span({ className: 'AnnouncementView_hi', onClick: () => this.value?.sendWelcome() }, '👋 Wave to say hi!'),
+                    t.time({ className: 'AnnouncementView_innertime' }, this.value?.time)
+                ] : [
+                    t.span(),
+                    t.time({ className: 'AnnouncementView_innertime' }, this.value?.time)
+                ]),
+                timeTitle,
+            ])
+        ])
     }
 
     /* This is called by the parent ListView, which just has 1 listener for the whole list */

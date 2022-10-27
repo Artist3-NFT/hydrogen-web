@@ -663,10 +663,19 @@ a {
     margin-left: 12px;
 }
 
-.MessageComposer_input>div>textarea {
+.MessageComposer_input>div.MessageComposer_input_container {
     border: 1px solid var(--common-light-border);
     border-radius: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.MessageComposer_input>div>textarea {
+    border: none;
     background: var(--background-color-secondary);
+    background-color: transparent;
+    outline: none;
     color: inherit;
     font-size: 14px;
     font-family: "Inter", sans-serif;
@@ -693,8 +702,8 @@ a {
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center;
-    align-self: end;
-    margin-bottom: 8px;
+    margin-right: 8px;
+    margin-left: 8px;
 }
 
 .MessageComposer_input>button.sendFile {
@@ -1344,6 +1353,9 @@ ul.menu .menu-item {
 
 .msg-vertical li.icon.msg-menu-more-pin .menu-item {
     background-image: url('icons/pin.svg?primary=icon-color');
+}
+.msg-vertical li.icon.msg-menu-more-emoji .menu-item {
+    background-image: url('icons/smile.svg?primary=icon-color');
 }
 
 .msg-vertical li.icon.msg-menu-more-reply .menu-item {

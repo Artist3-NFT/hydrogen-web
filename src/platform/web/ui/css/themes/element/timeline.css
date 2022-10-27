@@ -108,6 +108,17 @@ limitations under the License.
     width: 300px;
 }
 
+.AnnouncementView .timeTitle {
+    position: absolute;
+    top: -30px;
+}
+.AnnouncementView.showTime .timeTitle {
+    display: block;
+}
+.AnnouncementView .timeTitle {
+    display: none;
+}
+
 .Timeline_message:not(.continuation) {
     margin-top: 4px;
 }
@@ -187,6 +198,18 @@ limitations under the License.
     margin-top: 4px;
 }
 
+.Timeline_messageOptions3 {
+    position: absolute;
+    right: 8px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    background-image: url('icons/arrow-ios-down.svg');
+    background-color: transparent;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
 .Timeline_messageOptions2 {
     display: none;
     grid-area: body;
@@ -282,6 +305,30 @@ limitations under the License.
     min-width: 0;
 }
 
+.hydrogen .AnnouncementView .usercolor1 {
+    color: var(--usercolor1);
+}
+.hydrogen .AnnouncementView .usercolor2 {
+    color: var(--usercolor2);
+}
+.hydrogen .AnnouncementView .usercolor3 {
+    color: var(--usercolor3);
+}
+.hydrogen .AnnouncementView .usercolor4 {
+    color: var(--usercolor4);
+}
+.hydrogen .AnnouncementView .usercolor5 {
+    color: var(--usercolor5);
+}
+.hydrogen .AnnouncementView .usercolor6 {
+    color: var(--usercolor6);
+}
+.hydrogen .AnnouncementView .usercolor7 {
+    color: var(--usercolor7);
+}
+.hydrogen .AnnouncementView .usercolor8 {
+    color: var(--usercolor8);
+}
 .hydrogen .Timeline_messageSender.usercolor1 {
     color: var(--usercolor1);
 }
@@ -563,16 +610,48 @@ only loads when the top comes into view*/
 }
 
 .AnnouncementView {
-    margin: 5px 0;
-    padding: 5px 10%;
+    /* margin: 5px 0;
+    padding: 5px 10%; */
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 100%;
 }
 
-.AnnouncementView>div {
-    margin: 0 auto;
-    padding: 10px 20px;
+.AnnouncementView .AnnouncementView_inner .AnnouncementView_inner_below {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.AnnouncementView .AnnouncementView_inner .AnnouncementView_inner_upper {
+    display: flex;
+    flex-direction: row;
+    font-size: 12px;
+    line-height: 16px;
+}
+.AnnouncementView .AnnouncementView_inner .AnnouncementView_inner_upper .AnnouncementView_inner_upper_img {
+    width: 16px;
+    height: 16px;
+    background-position: center;
+    margin-right: 8px;
+    background-repeat: no-repeat;
+    background-image: url('icons/arrow-right.svg');
+    background-size: cover;
+}
+
+.AnnouncementView .AnnouncementView_inner {
+    margin-left: 12px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding: 4px 8px;
     background-color: var(--background-color-secondary);
     text-align: center;
     border-radius: 10px;
+}
+
+.AnnouncementView.showTime {
+    margin-top: 42px;
 }
 
 .GapView> :not(:first-child) {
@@ -589,7 +668,7 @@ only loads when the top comes into view*/
 
 .file-message .file-card {
     height: 48px;
-    padding: 0 8px;
+    padding: 0 16px 0 8px;
     width: 300px;
     max-width: 100%;
     display: flex;
