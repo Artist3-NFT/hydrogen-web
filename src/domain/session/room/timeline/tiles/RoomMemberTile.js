@@ -78,8 +78,8 @@ export class RoomMemberTile extends SimpleTile {
     updatePreviousSibling(prev) {
         super.updatePreviousSibling(prev);
         let isContinuation = false;
-        console.log('prev:', !!prev, '\n', prev, '\n\n', this.noContent, this.announcement, '==', this._entry?.entryIndex)
-        console.log('entryIndex:', this._entry?.entryIndex, prev?._entry?.entryIndex, ((this._entry?.entryIndex || 0) > (prev?._entry?.entryIndex || 0)))
+        // console.log('prev:', !!prev, '\n', prev, '\n\n', this.noContent, this.announcement, '==', this._entry?.entryIndex)
+        // console.log('entryIndex:', this._entry?.entryIndex, prev?._entry?.entryIndex, ((this._entry?.entryIndex || 0) > (prev?._entry?.entryIndex || 0)))
         if (isContinuation !== this._isContinuation) {
             this._isContinuation = isContinuation;
             this.emitChange("isContinuation");

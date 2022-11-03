@@ -40,7 +40,8 @@ export class BaseMessageView extends TemplateView {
         const timeTitleTimer = t.time({ className: {} }, vm.date);
         timeTitle.appendChild(timeTitleTimer)
         const children = [this.renderMessageBody(t, vm)];
-        if (this._interactive) {
+        // const dropDownAnchor = t.div({ className: 'Timeline_messageOptions3', onClick: (e) => this._toggleMenuMore(e.target, vm) });
+        if (vm.shape !== "redacted") {
             // const hoverer = t.div({ className: 'Timeline_messageOptions2' });
             // const hoveree1 = t.div({ className: 'hover-btn emoji', onClick: (e) => this._toggleEmojiMenu(e.target, vm) });
             // const hoveree2 = t.div({ className: 'hover-btn reply', onClick: () => vm.startReply() });

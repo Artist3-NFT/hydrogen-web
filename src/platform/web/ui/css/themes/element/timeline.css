@@ -724,15 +724,15 @@ only loads when the top comes into view*/
 
 .bottom-menu li.icon {
     background-color: var(--icon-background);
-    background-size: 24px 24px;
+    background-size: 20px;
     background-repeat: no-repeat;
     background-position: left 8% center;
     width: 155px;
-    height: 52px;
+    height: auto;
     margin-bottom: 0;
     padding-left: 12px;
     padding-right: 12px;
-    border-bottom: 1px solid rgba(207, 217, 232, 0.4);
+    border-bottom: 1px solid rgba(207, 217, 232, 0.2);
 }
 
 .bottom-menu li.icon:last-of-type {
@@ -740,8 +740,10 @@ only loads when the top comes into view*/
 }
 
 .bottom-menu li.icon .menu-item {
-    height: 52px;
+    height: 40px;
     padding: 0 0 0 32px;
+    font-size: 12px;
+    line-height: 16px;
 }
 
 .bottom-menu li.icon.picture {

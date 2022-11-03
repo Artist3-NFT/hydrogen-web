@@ -1337,8 +1337,8 @@ ul.menu .menu-item {
 .msg-vertical li.icon {
     width: 224px;
     margin-bottom: 0;
-    height: 52px;
-    border-bottom: 1px solid rgba(207, 217, 232, 0.4);
+    height: auto;
+    border-bottom: 1px solid rgba(207, 217, 232, 0.2);
 }
 
 .msg-vertical li.icon:last-of-type {
@@ -1348,7 +1348,10 @@ ul.menu .menu-item {
 .msg-vertical li.icon .menu-item {
     background-color: var(--icon-background);
     background-repeat: no-repeat;
-    background-position: right 6% bottom 10%;
+    background-position: right 6% bottom 50%;
+    background-size: 18px;
+    font-size: 12px;
+    line-height: 16px;
 }
 
 .msg-vertical li.icon.msg-menu-more-pin .menu-item {

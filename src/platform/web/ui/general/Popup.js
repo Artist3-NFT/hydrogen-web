@@ -101,15 +101,14 @@ export class Popup {
         const popupHeight = this._popup.clientHeight;
         const viewport = (this._scroller ? this._scroller : document.documentElement).getBoundingClientRect();
 
-        // if (
-        //     targetPosition.top > viewport.bottom ||
-        //     targetPosition.left > viewport.right ||
-        //     targetPosition.bottom < viewport.top ||
-        //     targetPosition.right < viewport.left
-        // ) {
-        //     this._popup.style.left = '68px';
-        //     return false;
-        // }
+        if (
+            targetPosition.top > viewport.bottom ||
+            targetPosition.left > viewport.right ||
+            targetPosition.bottom < viewport.top ||
+            targetPosition.right < viewport.left
+        ) {
+            return false;
+        }
         if (viewport.bottom >= targetPosition.bottom + popupHeight) {
             // show below
             this._popup.style.top = `${targetPosition.bottom + this._verticalPadding}px`;
@@ -124,14 +123,14 @@ export class Popup {
             this._popup.style.left = `${targetPosition.left}px`;
         } else if (viewport.left <= targetPosition.left - popupWidth) {
             // show left
-            if ((targetPosition.right - popupWidth) < 0) {
-                this._popup.style.left = '0px';
+            if ((targetPosition.right - popupWidth) < 8) {
+                this._popup.style.left = '8px';
             } else {
                 this._popup.style.left = `${targetPosition.right - popupWidth}px`;
             }
         } else {
-            if ((targetPosition.right - popupWidth) < 0) {
-                this._popup.style.left = '0px';
+            if ((targetPosition.right - popupWidth) < 8) {
+                this._popup.style.left = '8px';
             } else {
                 this._popup.style.left = `${targetPosition.right - popupWidth}px`;
             }
