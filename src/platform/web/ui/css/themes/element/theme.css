@@ -1372,6 +1372,9 @@ ul.menu .menu-item {
 .msg-vertical li.icon.msg-menu-more-cp-link .menu-item {
     background-image: url('icons/link-3.svg?primary=icon-color');
 }
+.msg-vertical li.icon.msg-menu-more-msg .menu-item {
+    background-image: url('icons/msg-user.svg?primary=icon-color');
+}
 
 .msg-vertical li.icon.msg-menu-more-del .menu-item {
     background-image: url('icons/delete.svg');

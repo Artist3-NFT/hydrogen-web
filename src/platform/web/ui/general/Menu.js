@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {TemplateView} from "./TemplateView";
+import { TemplateView } from "./TemplateView";
 
 export class Menu extends TemplateView {
     static option(label, callback) {
@@ -28,7 +28,7 @@ export class Menu extends TemplateView {
     }
 
     render(t) {
-        return t.ul({className: `menu ${this._className}`, role: "menu"}, this._options.map(o => o.toDOM(t)));
+        return t.ul({ className: `menu ${this._className}`, role: "menu" }, this._options.map(o => o.toDOM(t)));
     }
 }
 
@@ -37,11 +37,17 @@ class MenuOption {
         this.label = label;
         this.callback = callback;
         this.icon = null;
+        this.data = null;
         this.destructive = false;
     }
 
     setIcon(className) {
         this.icon = className;
+        return this;
+    }
+
+    setData(data) {
+        this.data = data;
         return this;
     }
 
@@ -60,6 +66,7 @@ class MenuOption {
         }
         return t.li({
             className,
-        }, t.button({className:"menu-item", onClick: this.callback}, this.label));
+            'data-iData': this.data || ''
+        }, t.button({ className: "menu-item", onClick: this.callback }, this.label));
     }
 }

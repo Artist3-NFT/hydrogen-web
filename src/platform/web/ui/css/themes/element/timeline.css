@@ -59,6 +59,21 @@ limitations under the License.
     margin-bottom: 0px;
 }
 
+.Timeline_message.haveThread {
+    margin-bottom: 28px !important;
+}
+
+.Timeline_message .thread-label {
+    position: absolute;
+    bottom: -20px;
+    left: 72px;
+    font-size: 11px;
+    line-height: 14px;
+    cursor: pointer;
+    color: #FB6320;
+    user-select: none;
+}
+
 .ReplyPreviewView .Timeline_message.newDay {
     margin-top: 8px !important;
     margin-bottom: 0px;
@@ -112,9 +127,11 @@ limitations under the License.
     position: absolute;
     top: -30px;
 }
+
 .AnnouncementView.showTime .timeTitle {
     display: block;
 }
+
 .AnnouncementView .timeTitle {
     display: none;
 }
@@ -210,6 +227,7 @@ limitations under the License.
     background-repeat: no-repeat;
     background-size: contain;
 }
+
 .Timeline_messageOptions2 {
     display: none;
     grid-area: body;
@@ -308,27 +326,35 @@ limitations under the License.
 .hydrogen .AnnouncementView .usercolor1 {
     color: var(--usercolor1);
 }
+
 .hydrogen .AnnouncementView .usercolor2 {
     color: var(--usercolor2);
 }
+
 .hydrogen .AnnouncementView .usercolor3 {
     color: var(--usercolor3);
 }
+
 .hydrogen .AnnouncementView .usercolor4 {
     color: var(--usercolor4);
 }
+
 .hydrogen .AnnouncementView .usercolor5 {
     color: var(--usercolor5);
 }
+
 .hydrogen .AnnouncementView .usercolor6 {
     color: var(--usercolor6);
 }
+
 .hydrogen .AnnouncementView .usercolor7 {
     color: var(--usercolor7);
 }
+
 .hydrogen .AnnouncementView .usercolor8 {
     color: var(--usercolor8);
 }
+
 .hydrogen .Timeline_messageSender.usercolor1 {
     color: var(--usercolor1);
 }
@@ -630,6 +656,7 @@ only loads when the top comes into view*/
     font-size: 12px;
     line-height: 16px;
 }
+
 .AnnouncementView .AnnouncementView_inner .AnnouncementView_inner_upper .AnnouncementView_inner_upper_img {
     width: 16px;
     height: 16px;

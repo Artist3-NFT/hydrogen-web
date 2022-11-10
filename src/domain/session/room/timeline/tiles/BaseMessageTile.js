@@ -17,6 +17,7 @@ limitations under the License.
 import { SimpleTile } from "./SimpleTile.js";
 import { ReactionsViewModel } from "../ReactionsViewModel.js";
 import { getIdentifierColorNumber, avatarInitials, getAvatarHttpUrl } from "../../../../avatar";
+import { ObservableMap } from "../../../../../observable/map/ObservableMap";
 
 export class BaseMessageTile extends SimpleTile {
     constructor(entry, options) {
@@ -25,9 +26,11 @@ export class BaseMessageTile extends SimpleTile {
         this._isContinuation = false;
         this._isSameDay = false;
         this._reactions = null;
+        this._threadAnchor = null;
         this._replyTile = null;
         if (this._entry.annotations || this._entry.pendingAnnotations) {
             this._updateReactions();
+            this._updateThreadAnchor();
         }
         this._updateReplyTileIfNeeded(undefined);
     }
@@ -136,6 +139,7 @@ export class BaseMessageTile extends SimpleTile {
         const action = super.updateEntry(entry, param);
         if (action.shouldUpdate) {
             this._updateReactions();
+            this._updateThreadAnchor();
         }
         this._updateReplyTileIfNeeded(param);
         return action;
@@ -179,6 +183,12 @@ export class BaseMessageTile extends SimpleTile {
     get reactions() {
         if (this.shape !== "redacted") {
             return this._reactions;
+        }
+        return null;
+    }
+    get threadAnchor() {
+        if (this.shape !== "redacted") {
+            return this._threadAnchor;
         }
         return null;
     }
@@ -250,6 +260,14 @@ export class BaseMessageTile extends SimpleTile {
                 this._reactions = new ReactionsViewModel(this);
             }
             this._reactions.update(annotations, pendingAnnotations);
+        }
+    }
+    _updateThreadAnchor() {
+        const { annotations } = this._entry;
+        if (!annotations) return
+        const threadKey = Object.keys(annotations).find(k => k.startsWith('thrd'))
+        if (threadKey) {
+            this._threadAnchor = threadKey;
         }
     }
 

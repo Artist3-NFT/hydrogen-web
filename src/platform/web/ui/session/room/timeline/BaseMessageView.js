@@ -41,6 +41,7 @@ export class BaseMessageView extends TemplateView {
         timeTitle.appendChild(timeTitleTimer)
         const children = [this.renderMessageBody(t, vm)];
         // const dropDownAnchor = t.div({ className: 'Timeline_messageOptions3', onClick: (e) => this._toggleMenuMore(e.target, vm) });
+        let dropDownAnchor = null
         if (vm.shape !== "redacted") {
             // const hoverer = t.div({ className: 'Timeline_messageOptions2' });
             // const hoveree1 = t.div({ className: 'hover-btn emoji', onClick: (e) => this._toggleEmojiMenu(e.target, vm) });
@@ -52,7 +53,7 @@ export class BaseMessageView extends TemplateView {
             // hoverer.appendChild(hoveree3)
             // hoverer.appendChild(hoveree4)
             // children.push(hoverer);
-            const dropDownAnchor = t.div({ className: 'Timeline_messageOptions3', onClick: (e) => this._toggleMenuMore(e.target, vm) });
+            dropDownAnchor = t.div({ className: 'Timeline_messageOptions3', onClick: (e) => this._toggleMenuMore(e.target, vm) });
             children.push(dropDownAnchor);
             // children.push(t.button({ className: "Timeline_messageOptions" }, "⋯"));
         }
@@ -64,7 +65,14 @@ export class BaseMessageView extends TemplateView {
                 unsent: vm.isUnsent,
                 unverified: vm.isUnverified,
                 disabled: !this._interactive,
+                haveThread: !!vm.threadAnchor,
                 continuation: vm => vm.isContinuation,
+            },
+            oncontextmenu: (e) => {
+                e?.preventDefault();
+                e?.stopPropagation();
+                this._toggleMenuMore(dropDownAnchor, vm)
+                return false
             },
             'data-event-id': vm.eventId
         }, children);
@@ -88,6 +96,7 @@ export class BaseMessageView extends TemplateView {
         // but that adds a comment node to all messages without reactions
         let reactionsView = null;
         t.mapSideEffect(vm => vm.reactions, reactions => {
+            // console.log('reactions:', reactions)
             if (reactions && this._interactive && !reactionsView) {
                 reactionsView = new ReactionsView(reactions);
                 this.addSubView(reactionsView);
@@ -99,6 +108,12 @@ export class BaseMessageView extends TemplateView {
                 reactionsView = null;
             }
         });
+        t.mapSideEffect(vm => vm.threadAnchor, threadAnchor => {
+            if (threadAnchor) {
+                const threadLabel = t.div({ className: 'thread-label', 'data-ithread': threadAnchor }, 'Open thread');
+                li.appendChild(threadLabel);
+            }
+        })
         // const parentNode = li.parentNode
         // console.log('parentNode:', parentNode)
         // parentNode.insertBefore(parentNode, parentNode.children[0])
@@ -139,11 +154,14 @@ export class BaseMessageView extends TemplateView {
     }
     _toggleMenuMore(button, vm) {
         const options = [];
-        options.push(Menu.option(vm.i18n`Pin message`, () => { }).setIcon('msg-menu-more-pin'));
+        options.push(Menu.option(vm.i18n`Pin message`, () => { }).setIcon('msg-menu-more-pin').setData(`${vm.sender}`));
+        if (!vm.isOwn) {
+            options.push(Menu.option(vm.i18n`Message user`, () => { }).setIcon('msg-menu-more-msg').setData(`${vm.sender}`));
+        }
         options.push(Menu.option(vm.i18n`Reply`, () => vm.startReply()).setIcon('msg-menu-more-reply'));
         options.push(Menu.option(vm.i18n`Add reaction`, () => this._toggleEmojiMenu(button, vm)).setIcon('msg-menu-more-emoji'));
-        options.push(Menu.option(vm.i18n`Create thread`, () => { }).setIcon('msg-menu-more-thread'));
-        options.push(Menu.option(vm.i18n`Copy message link`, () => { }).setIcon('msg-menu-more-cp-link'));
+        options.push(Menu.option(vm.i18n`Create thread`, () => { }).setIcon('msg-menu-more-thread').setData(`${vm.sender}`));
+        options.push(Menu.option(vm.i18n`Copy message link`, () => { }).setIcon('msg-menu-more-cp-link').setData(`${vm.sender}`));
         if (vm.canRedact) {
             options.push(Menu.option(vm.i18n`Delete message`, () => vm.redact()).setDestructive().setIcon('msg-menu-more-del'));
         }
