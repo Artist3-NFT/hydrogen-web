@@ -14,12 +14,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {TemplateView} from "../../general/TemplateView";
-import {spinner} from "../../common.js";
+import { TemplateView } from "../../general/TemplateView";
+import { spinner } from "../../common.js";
 
+let draging = false
+let dragingStartX = 0
+let dragingStartY = 0
 export class LightboxView extends TemplateView {
     render(t, vm) {
-        const close = t.a({href: vm.closeUrl, title: vm.i18n`Close`, className: "close"});
+
+        const wheelFunc = (e) => {
+            if (e.deltaY > 0) {
+                zoom += zoomingSpeed
+            } else {
+                zoom -= zoomingSpeed
+            }
+            if (zoom > 3) zoom = 3
+            if (zoom < 0.3) zoom = 0.3
+            image.style.transform = `scale(${(zoom)})`;
+        }
+
+        const close = t.a({
+            href: vm.closeUrl, title: vm.i18n`Close`, className: "close", onClick: () => {
+                document.removeEventListener("wheel", wheelFunc)
+                document.removeEventListener("wheel", wheelFunc)
+                const lightBoxDom = document.getElementById('lightbox-main')
+                lightBoxDom.parentNode.removeChild(lightBoxDom)
+                lightBoxDom = null
+            }
+        });
         const image = t.div({
             role: "img",
             "aria-label": vm => vm.name,
@@ -30,6 +53,29 @@ export class LightboxView extends TemplateView {
             },
             style: vm => `background-image: url('${vm.imageUrl}'); max-width: ${vm.imageWidth}px; max-height: ${vm.imageHeight}px;`
         });
+        let zoom = 1;
+        const zoomingSpeed = 0.1;
+
+        document.addEventListener("wheel", wheelFunc)
+        const imageContainer = t.div({
+            className: { 'lightbox-image-container': true },
+            onmousedown: (e) => {
+                draging = true
+                dragingStartX = e.x - (parseInt(image.style.left || 0))
+                dragingStartY = e.y - (parseInt(image.style.top) || 0)
+            },
+            onmousemove: (e) => {
+                if (draging) {
+                    image.style.top = `${e.y - dragingStartY}px`
+                    image.style.left = `${e.x - dragingStartX}px`
+                }
+            },
+            onmouseup: () => {
+                draging = false
+                dragingStartX = 0
+                dragingStartY = 0
+            },
+        }, image)
         const loading = t.div({
             className: {
                 loading: true,
@@ -47,7 +93,7 @@ export class LightboxView extends TemplateView {
             className: "lightbox",
             onClick: evt => this.clickToClose(evt),
             onKeydown: evt => this.closeOnEscKey(evt)
-        }, [image, loading, details, close]);
+        }, [imageContainer, loading, details, close]);
         trapFocus(t, dialog);
         return dialog;
     }

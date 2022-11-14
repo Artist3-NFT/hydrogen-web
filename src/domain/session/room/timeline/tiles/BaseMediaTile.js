@@ -31,6 +31,7 @@ export class BaseMediaTile extends BaseMessageTile {
         this._downloadError = null;
     }
 
+
     async downloadMedia() {
         if (this._downloading || this.isPending) {
             return;
