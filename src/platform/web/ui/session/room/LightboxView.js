@@ -59,16 +59,32 @@ export class LightboxView extends TemplateView {
         document.addEventListener("wheel", wheelFunc)
         const imageContainer = t.div({
             className: { 'lightbox-image-container': true },
+            ontouchstart: (e) => {
+                draging = true
+                dragingStartX = e.targetTouches[0].clientX - (parseInt(image.style.left || 0))
+                dragingStartY = e.targetTouches[0].clientY - (parseInt(image.style.top) || 0)
+            },
             onmousedown: (e) => {
                 draging = true
                 dragingStartX = e.x - (parseInt(image.style.left || 0))
                 dragingStartY = e.y - (parseInt(image.style.top) || 0)
+            },
+            ontouchmove: (e) => {
+                if (draging) {
+                    image.style.top = `${e.targetTouches[0].clientY - dragingStartY}px`
+                    image.style.left = `${e.targetTouches[0].clientX - dragingStartX}px`
+                }
             },
             onmousemove: (e) => {
                 if (draging) {
                     image.style.top = `${e.y - dragingStartY}px`
                     image.style.left = `${e.x - dragingStartX}px`
                 }
+            },
+            ontouchend: () => {
+                draging = false
+                dragingStartX = 0
+                dragingStartY = 0
             },
             onmouseup: () => {
                 draging = false
