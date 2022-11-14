@@ -58,7 +58,7 @@ export class TextMessageView extends BaseMessageView {
             container.appendChild(datetime);
             container.appendChild(time);
         });
-        if (emojione) {
+        if (emojione && vm._format === 'Plain') {
             container.innerHTML = emojione.toImage(container.innerHTML)
         }
         return container;
