@@ -40,23 +40,12 @@ export class BaseMessageView extends TemplateView {
         const timeTitleTimer = t.time({ className: {} }, vm.date);
         timeTitle.appendChild(timeTitleTimer)
         const children = [this.renderMessageBody(t, vm)];
-        // const dropDownAnchor = t.div({ className: 'Timeline_messageOptions3', onClick: (e) => this._toggleMenuMore(e.target, vm) });
         let dropDownAnchor = null
         if (vm.shape !== "redacted") {
-            // const hoverer = t.div({ className: 'Timeline_messageOptions2' });
-            // const hoveree1 = t.div({ className: 'hover-btn emoji', onClick: (e) => this._toggleEmojiMenu(e.target, vm) });
-            // const hoveree2 = t.div({ className: 'hover-btn reply', onClick: () => vm.startReply() });
-            // const hoveree3 = t.div({ className: 'hover-btn thread', onClick: () => { } });
-            // const hoveree4 = t.div({ className: 'hover-btn more', onClick: (e) => this._toggleMenuMore(e.target, vm) });
-            // hoverer.appendChild(hoveree1)
-            // hoverer.appendChild(hoveree2)
-            // hoverer.appendChild(hoveree3)
-            // hoverer.appendChild(hoveree4)
-            // children.push(hoverer);
             dropDownAnchor = t.div({ className: 'Timeline_messageOptions3', onClick: (e) => this._toggleMenuMore(e.target, vm) });
             children.push(dropDownAnchor);
-            // children.push(t.button({ className: "Timeline_messageOptions" }, "⋯"));
         }
+
         const li = t.el(this._tagName, {
             className: {
                 "Timeline_message": true,
@@ -108,16 +97,17 @@ export class BaseMessageView extends TemplateView {
                 reactionsView = null;
             }
         });
+        li.appendChild(timeTitle)
         t.mapSideEffect(vm => vm.threadAnchor, threadAnchor => {
             if (threadAnchor) {
                 const threadLabel = t.div({ className: 'thread-label', 'data-ithread': threadAnchor }, 'Open thread');
                 li.appendChild(threadLabel);
+                if (!li.classList.contains('haveThread')) {
+                    li.classList.add('haveThread')
+                }
             }
+
         })
-        // const parentNode = li.parentNode
-        // console.log('parentNode:', parentNode)
-        // parentNode.insertBefore(parentNode, parentNode.children[0])
-        li.appendChild(timeTitle)
         return li;
     }
 
@@ -160,7 +150,11 @@ export class BaseMessageView extends TemplateView {
         }
         options.push(Menu.option(vm.i18n`Reply`, () => vm.startReply()).setIcon('msg-menu-more-reply'));
         options.push(Menu.option(vm.i18n`Add reaction`, () => this._toggleEmojiMenu(button, vm)).setIcon('msg-menu-more-emoji'));
-        options.push(Menu.option(vm.i18n`Create thread`, () => { }).setIcon('msg-menu-more-thread').setData(`${vm.sender}`));
+        if (!vm.threadAnchor) {
+            options.push(Menu.option(vm.i18n`Create thread`, (e) => {
+                e.sendReact = (threadId) => vm.react(threadId)
+            }).setIcon('msg-menu-more-thread').setData(`${vm.sender}`));
+        }
         options.push(Menu.option(vm.i18n`Copy message link`, () => { }).setIcon('msg-menu-more-cp-link').setData(`${vm.sender}`));
         if (vm.canRedact) {
             options.push(Menu.option(vm.i18n`Delete message`, () => vm.redact()).setDestructive().setIcon('msg-menu-more-del'));

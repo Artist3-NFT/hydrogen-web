@@ -43,6 +43,8 @@ export class TextMessageView extends BaseMessageView {
             }
         }));
 
+
+
         // exclude comment nodes as they are used by t.map and friends for placeholders
         const shouldRemove = (element) => element?.nodeType !== Node.COMMENT_NODE && element.className !== "ReplyPreviewView";
 
@@ -56,7 +58,9 @@ export class TextMessageView extends BaseMessageView {
             container.appendChild(datetime);
             container.appendChild(time);
         });
-
+        if (emojione) {
+            container.innerHTML = emojione.toImage(container.innerHTML)
+        }
         return container;
     }
 }

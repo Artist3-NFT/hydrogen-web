@@ -128,7 +128,6 @@ export class BaseMessageTile extends SimpleTile {
             this._isContinuation = isContinuation;
             this.emitChange("isContinuation");
         }
-        // if (prev && prev.date === this.date) {
         if (prev && (prev instanceof BaseMessageTile) && prev.date === this.date) {
             this._isSameDay = true;
             this.emitChange("isSameDay");

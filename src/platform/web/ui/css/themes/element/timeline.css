@@ -18,7 +18,7 @@ limitations under the License.
 .Timeline_jumpDown {
     width: 40px;
     height: 40px;
-    bottom: 16px;
+    bottom: 80px;
     right: 32px;
     border-radius: 100%;
     border: 1px solid var(--background-color-secondary--darker-7);
@@ -46,7 +46,7 @@ limitations under the License.
     padding: 4px;
     max-width: 60%;
     box-sizing: border-box;
-    margin-top: 8px;
+    margin-top: 4px;
     margin-bottom: 0px;
     margin-right: auto;
     margin-left: 0px;
@@ -55,7 +55,7 @@ limitations under the License.
 }
 
 .Timeline_message.newDay:not(.continuation):not(.disabled) {
-    margin-top: 62px !important;
+    margin-top: 72px !important;
     margin-bottom: 0px;
 }
 
@@ -137,7 +137,11 @@ limitations under the License.
 }
 
 .Timeline_message:not(.continuation) {
-    margin-top: 4px;
+    margin-top: 8px;
+}
+
+.Timeline_message.own {
+    margin-top: 4px !important;
 }
 
 .ReplyPreviewView .Timeline_message {

@@ -68,8 +68,9 @@ export class RoomMemberTile extends SimpleTile {
         const { sender, content, prevContent, stateKey } = this._entry;
         const senderName = this._entry.displayName || sender;
         const targetName = sender === stateKey ? senderName : (this._entry.content?.displayname || stateKey);
-        const mainInput = document.getElementById('main_input')
-        const mainSendButton = document.getElementById('main_send_button')
+        // const mainInput = document.getElementById('main_input')
+        const mainInput = document.querySelector('.welcome-channel #main_input')
+        const mainSendButton = document.querySelector('.welcome-channel #main_send_button')
         if (mainInput) {
             mainInput.value = `Welcome @${targetName}`
             mainSendButton.click()
