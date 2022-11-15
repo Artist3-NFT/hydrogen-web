@@ -63,6 +63,16 @@ limitations under the License.
     margin-bottom: 28px !important;
 }
 
+.ReplyPreviewView .Timeline_message.haveThread,
+.MessageComposer_replyPreview .Timeline_message.haveThread {
+    margin-bottom: 0px !important;
+}
+
+.ReplyPreviewView .thread-label,
+.MessageComposer_replyPreview .thread-label {
+    display: none;
+}
+
 .Timeline_message .thread-label {
     position: absolute;
     bottom: -20px;
@@ -215,7 +225,7 @@ limitations under the License.
 }
 
 .Timeline_message:not(.continuation) .Timeline_messageSender,
-.Timeline_message:not(.continuation) .Timeline_messageBody {
+.Timeline_message .Timeline_messageBody {
     margin-top: 4px;
 }
 

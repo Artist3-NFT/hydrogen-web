@@ -38,7 +38,7 @@ export class LightboxView extends TemplateView {
             href: vm.closeUrl, title: vm.i18n`Close`, className: "close", onClick: () => {
                 document.removeEventListener("wheel", wheelFunc)
                 document.removeEventListener("wheel", wheelFunc)
-                const lightBoxDom = document.getElementById('lightbox-main')
+                let lightBoxDom = document.getElementById('lightbox-main')
                 lightBoxDom.parentNode.removeChild(lightBoxDom)
                 lightBoxDom = null
             }
@@ -51,22 +51,28 @@ export class LightboxView extends TemplateView {
                 picture: true,
                 hidden: vm => !vm.imageUrl,
             },
-            style: vm => `background-image: url('${vm.imageUrl}'); max-width: ${vm.imageWidth}px; max-height: ${vm.imageHeight}px;`
+            style: vm => `
+                background-image: url('${vm.imageUrl}'); 
+                max-width: ${vm.imageWidth}px; 
+                max-height: ${vm.imageHeight}px;
+                top:${(vm.imageHeight + 32) > window.innerHeight ? '0' : ((window.innerHeight - vm.imageHeight - 32) / 2) + 'px'};
+                left:${(vm.imageWidth + 32) > window.innerWidth ? '0' : ((window.innerWidth - vm.imageWidth - 32) / 2) + 'px'};
+            `
         });
         let zoom = 1;
-        const zoomingSpeed = 0.1;
+        const zoomingSpeed = 0.05;
 
         document.addEventListener("wheel", wheelFunc)
         const imageContainer = t.div({
             className: { 'lightbox-image-container': true },
             ontouchstart: (e) => {
                 draging = true
-                dragingStartX = e.targetTouches[0].clientX - (parseInt(image.style.left || 0))
+                dragingStartX = e.targetTouches[0].clientX - (parseInt(image.style.left) || 0)
                 dragingStartY = e.targetTouches[0].clientY - (parseInt(image.style.top) || 0)
             },
             onmousedown: (e) => {
                 draging = true
-                dragingStartX = e.x - (parseInt(image.style.left || 0))
+                dragingStartX = e.x - (parseInt(image.style.left) || 0)
                 dragingStartY = e.y - (parseInt(image.style.top) || 0)
             },
             ontouchmove: (e) => {
