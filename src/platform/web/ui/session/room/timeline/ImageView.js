@@ -17,14 +17,32 @@ limitations under the License.
 import { BaseMediaView } from "./BaseMediaView.js";
 import { LightboxViewModel } from "../../../../../../domain/session/room/LightboxViewModel.js";
 import { LightboxView } from "../../room/LightboxView.js";
+import pic from "../../../css/themes/element/icons/default-banner.svg";
 
 export class ImageView extends BaseMediaView {
     renderMedia(t, vm) {
         const img = t.img({
             src: vm => vm.thumbnailUrl,
-            alt: vm => vm.label,
+            alt: vm => {
+                if (vm.label.length > 20) {
+                    return vm.label.substring(0, 20) + '...'
+                }
+                return vm.label
+            },
+            onload: () => {
+                img.style.backgroundImage = 'unset'
+                img.style.minHeight = 'unset'
+                img.style.minWidth = 'unset'
+            },
             title: vm => vm.label,
-            style: `max-width: ${vm.width}px; max-height: ${vm.height}px;`,
+            style: `max-width: ${vm.width}px; max-height: ${vm.height}px;
+            min-width: 100px;
+            color: #eee;
+            font-size: 14px;
+            min-height: auto;
+            background-image:url(${pic});
+            background-repeat: no-repeat;
+            background-size: contain;`,
             onClick: () => {
                 if (window.lightBoxVM) {
                     window.lightBoxVM = null
