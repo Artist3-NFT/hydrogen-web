@@ -149,6 +149,16 @@ export class MessageComposer extends TemplateView {
             })
 
             document.body.appendChild(this._EmkojiPicker)
+            setTimeout(() => {
+                const inMain = (evt.path || []).find(pth => pth.id === 'hydrogen-container')
+                if (this._EmkojiPicker) {
+                    if (inMain) {
+                        this._EmkojiPicker.className = 'inmain'
+                    } else {
+                        this._EmkojiPicker.className = 'not-inmain'
+                    }
+                }
+            })
         } else {
             if (this._EmkojiPicker.style.display === 'none') {
                 this._EmkojiPicker.style.display = 'flex'
