@@ -116,7 +116,8 @@ export class Popup {
             // show top
             this._popup.style.top = `${targetPosition.top - popupHeight - this._verticalPadding}px`;
         } else {
-            this._popup.style.top = `${targetPosition.top - popupHeight - this._verticalPadding}px`;
+            this._popup.style.top = 'unset';
+            this._popup.style.bottom = '80px';
         }
         if (viewport.right >= targetPosition.right + popupWidth) {
             // show right

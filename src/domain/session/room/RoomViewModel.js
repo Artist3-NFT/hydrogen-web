@@ -279,7 +279,8 @@ export class RoomViewModel extends ViewModel {
                     if (replyingTo) {
                         await replyingTo.reply(msgtype, message);
                     } else {
-                        await this._room.sendEvent("m.room.message", {msgtype, body: message});
+                        const res = await this._room.sendEvent("m.room.message", {msgtype, body: message});
+                        return res
                     }
                 }
             } catch (err) {

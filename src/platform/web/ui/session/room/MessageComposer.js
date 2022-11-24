@@ -52,7 +52,7 @@ export class MessageComposer extends TemplateView {
             return t.div({
                 className: "MessageComposer_replyPreview"
             }, [
-                t.span({ className: "replying" }, "Replying"),
+                t.span({ className: "replying" }, "Replying to " + rvm.displayName),
                 t.button({
                     className: "cancel",
                     onClick: () => this._clearReplyingTo()
@@ -71,12 +71,19 @@ export class MessageComposer extends TemplateView {
                 title: vm.i18n`Pick attachment`,
                 onClick: evt => this._toggleAttachmentMenu(evt),
             }, vm.i18n`Send file`),
-            t.div({className: 'MessageComposer_input_container'}, [
+            t.div({ className: 'MessageComposer_input_container' }, [
                 this._input,
                 t.button({
                     id: 'main_send_button',
                     className: "send",
-                    onClick: () => this._trySend(),
+                    onClick: async (event) => {
+                        event.onDataGet = (newMessageData) => {
+                            event.mData = newMessageData
+                        }
+                        const res = await this._trySend();
+                        const mData = { content: res.data }
+                        event.onDataGet(mData)
+                    },
                 }),
             ])
         ]);
@@ -113,20 +120,27 @@ export class MessageComposer extends TemplateView {
         this._input.value = "";
         this._clearHeight();
         try {
-            if (!await this.value.sendMessage(value)) {
+            const sendMessageResult = await this.value.sendMessage(value)
+            if (!sendMessageResult) {
                 restoreValue();
             }
+            return sendMessageResult
         } catch (err) {
             restoreValue();
             console.error(err);
         }
     }
 
-    _onKeyDown(event) {
+    async _onKeyDown(event) {
         if (event.key === "Enter" && !event.shiftKey) {
             // don't insert newline into composer
             event.preventDefault();
-            this._trySend();
+            event.onDataGet = (newMessageData) => {
+                event.mData = newMessageData
+            }
+            const res = await this._trySend();
+            const mData = { content: res.data }
+            event.onDataGet(mData)
         }
     }
 

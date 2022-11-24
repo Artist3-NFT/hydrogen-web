@@ -26,7 +26,7 @@
                 "name": "Dark",
                 "variables": {
                     "background-color-primary": "#0F0F0F",
-                    "background-color-secondary": "#181818",
+                    "background-color-secondary": "#292929",
                     "text-color": "#fff",
                     "accent-color": "#03B381",
                     "error-color": "#FF4B55",
