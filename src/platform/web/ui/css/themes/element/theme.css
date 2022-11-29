@@ -629,7 +629,7 @@ a {
 
 .MessageComposer_input,
 .MessageComposer_replyPreview {
-    padding: 8px;
+    padding: 24px;
 }
 
 .MessageComposer_replyPreview>.replying {
@@ -678,10 +678,11 @@ a {
     outline: none;
     color: inherit;
     font-size: 14px;
+    min-height: 40px;
     font-family: "Inter", sans-serif;
     resize: none;
     flex: 1;
-    padding: 14px;
+    padding: 10px 14px;
     box-sizing: border-box;
     overflow: hidden;
     max-height: 113px;

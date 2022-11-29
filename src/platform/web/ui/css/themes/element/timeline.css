@@ -84,8 +84,8 @@ limitations under the License.
     user-select: none;
 }
 
-.ReplyPreviewView .Timeline_message.newDay {
-    margin-top: 8px !important;
+.ReplyPreviewView .Timeline_message {
+    margin-top: 0px;
     margin-bottom: 0px;
 }
 
@@ -662,6 +662,7 @@ only loads when the top comes into view*/
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-top: 8px;
 }
 
 .AnnouncementView .AnnouncementView_inner .AnnouncementView_inner_upper {
@@ -683,8 +684,8 @@ only loads when the top comes into view*/
 
 .AnnouncementView .AnnouncementView_inner {
     margin-left: 12px;
-    margin-top: 6px;
-    margin-bottom: 6px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     padding: 4px 8px;
     background-color: var(--background-color-secondary);
     text-align: center;

@@ -45,7 +45,7 @@ export class BaseMessageView extends TemplateView {
             dropDownAnchor = t.div({ className: 'Timeline_messageOptions3', onClick: (e) => this._toggleMenuMore(e.target, vm) });
             children.push(dropDownAnchor);
         }
-
+        var timer
         const li = t.el(this._tagName, {
             className: {
                 "Timeline_message": true,
@@ -56,6 +56,25 @@ export class BaseMessageView extends TemplateView {
                 disabled: !this._interactive,
                 haveThread: !!vm.threadAnchor,
                 continuation: vm => vm.isContinuation,
+            },
+            ontouchmove: () => {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+            },
+            ontouchstart: (e) => {
+                if (!timer) {
+                    timer = setTimeout(() => {
+                        this._toggleMenuMore(dropDownAnchor, vm)
+                    }, 600);
+                }
+            },
+            ontouchend: () => {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
             },
             oncontextmenu: (e) => {
                 e?.preventDefault();

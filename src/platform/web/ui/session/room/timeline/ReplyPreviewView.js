@@ -36,7 +36,7 @@ export class ReplyPreviewView extends TemplateView {
                     renderStaticAvatar(vm, 12, undefined, true),
                     vm.displayName,
                 ]),
-                t.br(),
+                // t.br(),
                 t.view(view),
             ])
         );
