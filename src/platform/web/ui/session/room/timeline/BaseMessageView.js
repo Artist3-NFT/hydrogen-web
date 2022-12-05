@@ -180,7 +180,7 @@ export class BaseMessageView extends TemplateView {
         }
         this.root().classList.add("menuOpen");
         const onClose = () => this.root().classList.remove("menuOpen");
-        this._menuPopup = new Popup(new Menu(options, 'msg-vertical'), onClose);
+        this._menuPopup = new Popup(new Menu(options, vm.isOwn ? 'msg-vertical is-own-menu' : 'msg-vertical'), onClose);
         this._menuPopup.trackInTemplateView(this);
         this._menuPopup.showRelativeTo(button, 2);
     }

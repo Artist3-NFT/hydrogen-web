@@ -25,7 +25,7 @@
                 "variables": {
                     "background-color-primary": "#21262b",
                     "background-color-secondary": "#2D3239",
-                    "text-color": "#fff",
+                    "text-color": "#000",
                     "accent-color": "#F03F5B",
                     "error-color": "#FF4B55",
                     "fixed-white": "#fff",

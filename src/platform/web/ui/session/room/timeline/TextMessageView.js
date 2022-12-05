@@ -58,6 +58,22 @@ export class TextMessageView extends BaseMessageView {
             container.appendChild(datetime);
             container.appendChild(time);
         });
+        if (container.innerHTML.includes('@All')) {
+            container.innerHTML = container.innerHTML.replace('@All', `<span class="msg-mention-hightlight">@All</span>`)
+        }
+        if (window.currentRoomMembers) {
+            const memberUserNames = window.currentRoomMembers.filter(r => container.innerHTML.includes(`@${r.username}`)).map(u => u.username)
+            memberUserNames.forEach(name => {
+                container.innerHTML = container.innerHTML.replace(`@${name}`, `<span class="msg-mention-hightlight">@${name}</span>`)
+            })
+        } else {
+            if (container.innerHTML.includes('@')) {
+                if (!window.currentRoomMentions) {
+                    window.currentRoomMentions = []
+                }
+                window.currentRoomMentions.push(container)
+            }
+        }
         if (emojione && emojione?.toImage && vm._format === 'Plain') {
             container.innerHTML = emojione.toImage(container.innerHTML)
         }

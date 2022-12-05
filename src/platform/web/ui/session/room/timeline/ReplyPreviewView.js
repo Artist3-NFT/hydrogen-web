@@ -29,7 +29,11 @@ export class ReplyPreviewView extends TemplateView {
         }
         const view = new TileView(vm, this._viewClassForTile, { reply: true, interactive: false });
         return t.div(
-            { className: "ReplyPreviewView" },
+            {
+                className: 'ReplyPreviewView', onclick: (e) => {
+                    e.replyEventId = vm.eventId
+                }
+            },
             t.blockquote([
                 t.a({ className: "link" }, "In reply to"),
                 t.a({ className: "pill" }, [
