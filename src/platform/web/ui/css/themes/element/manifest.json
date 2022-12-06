@@ -11,6 +11,7 @@
                 "variables": {
                     "background-color-primary": "#fff",
                     "background-color-secondary": "#f6f6f6",
+                    "common-light-border": "#CCCCCC",
                     "text-color": "#2E2F32",
                     "accent-color": "#03b381",
                     "error-color": "#FF4B55",

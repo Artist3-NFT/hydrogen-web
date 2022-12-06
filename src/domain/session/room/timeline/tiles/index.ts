@@ -48,6 +48,7 @@ export function tileClassForEntry(entry: TimelineEntry): TileConstructor | undef
     if (entry.isGap) {
         return GapTile;
     } else if (entry.isPending && entry.pendingEvent.isMissingAttachments) {
+        return undefined;
         return MissingAttachmentTile;
     } else if (entry.eventType) {
         switch (entry.eventType) {

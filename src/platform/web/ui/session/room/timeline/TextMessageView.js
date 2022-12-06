@@ -74,8 +74,8 @@ export class TextMessageView extends BaseMessageView {
                 window.currentRoomMentions.push(container)
             }
         }
-        if (emojione && emojione?.toImage && vm._format === 'Plain') {
-            container.innerHTML = emojione.toImage(container.innerHTML)
+        if (window.emojione && window.emojione?.toImage && vm._format === 'Plain') {
+            container.innerHTML = window.emojione?.toImage?.(container.innerHTML)
         }
         return container;
     }
