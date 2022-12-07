@@ -102,28 +102,33 @@ export class BaseMessageView extends TemplateView {
         // similarly, we could do this with a simple ifView,
         // but that adds a comment node to all messages without reactions
         let reactionsView = null;
+        const time = t.time({ className: { hidden: !vm.time } }, vm.time);
         t.mapSideEffect(vm => vm.reactions, reactions => {
             if (reactions && this._interactive && !reactionsView) {
                 reactionsView = new ReactionsView(reactions);
                 this.addSubView(reactionsView);
+                while (timeContainer.firstChild) {
+                    timeContainer.removeChild(timeContainer.firstChild);
+                }
                 timeContainer.appendChild(mountView(reactionsView));
-            } else if (!reactions && reactionsView) {
-                timeContainer.removeChild(reactionsView.root());
-                reactionsView.unmount();
-                this.removeSubView(reactionsView);
-                reactionsView = null;
+                timeContainer.appendChild(time)
+            } else if (!reactions) {
+                if (reactionsView) {
+                    timeContainer.removeChild(reactionsView.root());
+                    reactionsView.unmount();
+                    this.removeSubView(reactionsView);
+                    reactionsView = null;
+                }
+                while (timeContainer.firstChild) {
+                    timeContainer.removeChild(timeContainer.firstChild);
+                }
+                const timeBlock = t.div({ className: 'flex-1' });
+                timeContainer.appendChild(timeBlock)
+                timeContainer.appendChild(time)
             }
         });
-        const time = t.time({ className: { hidden: !vm.time } }, vm.time);
-        if (timeContainer.children.length <= 0) {
-            const time = t.div({ className: 'flex-1' });
-            timeContainer.appendChild(time)
-        }
 
-        timeContainer.appendChild(time)
         li.appendChild(timeContainer)
-
-
 
         t.mapSideEffect(vm => vm.threadAnchor, threadAnchor => {
             if (threadAnchor) {

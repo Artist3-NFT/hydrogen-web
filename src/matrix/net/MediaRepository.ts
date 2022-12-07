@@ -88,10 +88,8 @@ export class MediaRepository {
 
     async downloadAttachment(content: Attachment, cache: boolean = false): Promise<BlobHandle> {
         if (content.file) {
-            console.log('Download sdsadas:', content)
             return this.downloadEncryptedFile(content.file, cache);
         } else {
-            console.log('Download sdsadas 22:', content)
             return this.downloadPlaintextFile(content.url!, content.info?.mimetype, cache);
         }
     }

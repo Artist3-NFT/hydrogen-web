@@ -27,7 +27,6 @@ export class FileTile extends BaseMessageTile {
     }
 
     async download() {
-        console.log('Download start')
         if (this._downloading || this.isPending) {
             return;
         }
@@ -37,7 +36,6 @@ export class FileTile extends BaseMessageTile {
         this.emitChange("label");
         let blob;
         try {
-            console.log('Download start:', content)
             blob = await this._mediaRepository.downloadAttachment(content);
             // this.platform.saveFileAs(blob, filename);
         } catch (err) {

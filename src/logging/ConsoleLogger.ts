@@ -19,7 +19,7 @@ import type {ILogItem, LogItemValues, ILogExport} from "./types";
 
 export class ConsoleLogger extends BaseLogger {
     _persistItem(item: LogItem): void {
-        printToConsole(item);
+        // printToConsole(item);
     }
 
     async export(): Promise<ILogExport | undefined> {
@@ -63,7 +63,7 @@ function printToConsole(item: LogItem): void {
     }
     if (item.children) {
         for(const c of item.children) {
-            printToConsole(c);
+            // printToConsole(c);
         }
     }
     if (shouldGroup) {
