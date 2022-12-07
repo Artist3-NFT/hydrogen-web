@@ -36,9 +36,6 @@ export class BaseMessageView extends TemplateView {
     get _isReplyPreview() { return this._renderFlags?.reply; }
 
     render(t, vm) {
-        const timeTitle = t.div({ className: { hidden: !vm.date, timeTitle: true } });
-        const timeTitleTimer = t.time({ className: {} }, vm.date);
-        timeTitle.appendChild(timeTitleTimer)
         const children = [this.renderMessageBody(t, vm)];
         let dropDownAnchor = null
         if (vm.shape !== "redacted") {
@@ -100,23 +97,34 @@ export class BaseMessageView extends TemplateView {
                 li.insertBefore(sender, li.firstChild);
             }
         });
+        const timeContainer = t.time({ className: { timeReactContainer: true } });
+
         // similarly, we could do this with a simple ifView,
         // but that adds a comment node to all messages without reactions
         let reactionsView = null;
         t.mapSideEffect(vm => vm.reactions, reactions => {
-            // console.log('reactions:', reactions)
             if (reactions && this._interactive && !reactionsView) {
                 reactionsView = new ReactionsView(reactions);
                 this.addSubView(reactionsView);
-                li.appendChild(mountView(reactionsView));
+                timeContainer.appendChild(mountView(reactionsView));
             } else if (!reactions && reactionsView) {
-                li.removeChild(reactionsView.root());
+                timeContainer.removeChild(reactionsView.root());
                 reactionsView.unmount();
                 this.removeSubView(reactionsView);
                 reactionsView = null;
             }
         });
-        li.appendChild(timeTitle)
+        const time = t.time({ className: { hidden: !vm.time } }, vm.time);
+        if (timeContainer.children.length <= 0) {
+            const time = t.div({ className: 'flex-1' });
+            timeContainer.appendChild(time)
+        }
+
+        timeContainer.appendChild(time)
+        li.appendChild(timeContainer)
+
+
+
         t.mapSideEffect(vm => vm.threadAnchor, threadAnchor => {
             if (threadAnchor) {
                 const threadLabel = t.div({ className: 'thread-label', 'data-ithread': threadAnchor }, 'Open thread');
@@ -125,7 +133,6 @@ export class BaseMessageView extends TemplateView {
                     li.classList.add('haveThread')
                 }
             }
-
         })
         return li;
     }

@@ -124,6 +124,24 @@ limitations under the License.
     display: none;
 }
 
+.Timeline_message .timeReactContainer {
+    grid-area: reactions;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.Timeline_message .timeReactContainer .flex-1 {
+    flex: 1;
+}
+
+.Timeline_message .timeReactContainer .Timeline_messageReactions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
 .newDay .timeTitle {
     display: flex;
     grid-area: dtime;

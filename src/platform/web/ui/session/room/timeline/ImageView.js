@@ -23,20 +23,15 @@ export class ImageView extends BaseMediaView {
     renderMedia(t, vm) {
         const img = t.img({
             src: vm => vm.thumbnailUrl,
-            alt: vm => {
-                if (vm.label.length > 20) {
-                    return vm.label.substring(0, 20) + '...'
-                }
-                return vm.label
-            },
+            alt: () => '',
             onload: () => {
                 img.style.backgroundImage = 'unset'
                 img.style.minHeight = 'unset'
                 img.style.minWidth = 'unset'
             },
             title: vm => vm.label,
-            style: `max-width: ${vm.width}px; max-height: ${vm.height}px;
-            min-width: 100px;
+            style: `max-width: ${vm.width < 120 ? 120 : vm.width}px; max-height: ${vm.height < 120 ? 120 : vm.height}px;
+            min-width: 120px;
             color: #eee;
             font-size: 14px;
             min-height: auto;

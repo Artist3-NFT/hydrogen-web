@@ -21,7 +21,6 @@ import { ReplyPreviewError, ReplyPreviewView } from "./ReplyPreviewView.js";
 export class TextMessageView extends BaseMessageView {
     renderMessageBody(t, vm) {
         const time = t.time({ className: { hidden: !vm.time } }, vm.time);
-        const datetime = t.time({ className: { hidden: !vm.date, datetimeAtEnd: true } }, vm.date);
         const container = t.div({
             className: {
                 "Timeline_messageBody": true,
@@ -55,12 +54,9 @@ export class TextMessageView extends BaseMessageView {
             for (const part of body.parts) {
                 container.appendChild(renderPart(part));
             }
-            container.appendChild(datetime);
-            container.appendChild(time);
         });
-        if (container.innerHTML.includes('@All')) {
-            container.innerHTML = container.innerHTML.replace('@All', `<span class="msg-mention-hightlight">@All</span>`)
-        }
+
+        // container.appendChild(timeContainer);
         if (window.currentRoomMembers) {
             const memberUserNames = window.currentRoomMembers.filter(r => container.innerHTML.includes(`@${r.username}`)).map(u => u.username)
             memberUserNames.forEach(name => {
