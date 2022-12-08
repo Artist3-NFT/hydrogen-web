@@ -15,20 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {TimelineViewModel} from "./timeline/TimelineViewModel.js";
-import {ComposerViewModel} from "./ComposerViewModel.js"
-import {avatarInitials, getIdentifierColorNumber, getAvatarHttpUrl} from "../../avatar";
-import {ViewModel} from "../../ViewModel";
-import {imageToInfo} from "../common.js";
+import { TimelineViewModel } from "./timeline/TimelineViewModel.js";
+import { ComposerViewModel } from "./ComposerViewModel.js"
+import { avatarInitials, getIdentifierColorNumber, getAvatarHttpUrl } from "../../avatar";
+import { ViewModel } from "../../ViewModel";
+import { imageToInfo } from "../common.js";
 // TODO: remove fallback so default isn't included in bundle for SDK users that have their custom tileClassForEntry
 // this is a breaking SDK change though to make this option mandatory
-import {tileClassForEntry as defaultTileClassForEntry} from "./timeline/tiles/index";
-import {RoomStatus} from "../../../matrix/room/common";
+import { tileClassForEntry as defaultTileClassForEntry } from "./timeline/tiles/index";
+import { RoomStatus } from "../../../matrix/room/common";
 
 export class RoomViewModel extends ViewModel {
     constructor(options) {
         super(options);
-        const {room, tileClassForEntry} = options;
+        const { room, tileClassForEntry } = options;
         this._room = room;
         this._timelineVM = null;
         this._tileClassForEntry = tileClassForEntry ?? defaultTileClassForEntry;
@@ -38,7 +38,7 @@ export class RoomViewModel extends ViewModel {
         this._sendError = null;
         this._composerVM = null;
         if (room.isArchived) {
-            this._composerVM = this.track(new ArchivedViewModel(this.childOptions({archivedRoom: room})));
+            this._composerVM = this.track(new ArchivedViewModel(this.childOptions({ archivedRoom: room })));
         } else {
             this._recreateComposerOnPowerLevelChange();
         }
@@ -197,7 +197,7 @@ export class RoomViewModel extends ViewModel {
             }
         }
     }
-    
+
     async _processCommandJoin(roomName) {
         try {
             const roomId = await this._options.client.session.joinRoom(roomName);
@@ -219,9 +219,9 @@ export class RoomViewModel extends ViewModel {
             this._timelineError = null;
             this.emitChange("error");
         }
-    } 
+    }
 
-    async _processCommand (message) {
+    async _processCommand(message) {
         let msgtype;
         const [commandName, ...args] = message.substring(1).split(" ");
         switch (commandName) {
@@ -260,13 +260,13 @@ export class RoomViewModel extends ViewModel {
                 this._timelineError = null;
                 this.emitChange("error");
                 message = undefined;
-       }
-       return {type: msgtype, message: message};
-   }
-    
+        }
+        return { type: msgtype, message: message };
+    }
+
     async _sendMessage(message, replyingTo) {
         if (!this._room.isArchived && message) {
-            let messinfo = {type : "m.text", message : message};
+            let messinfo = { type: "m.text", message: message };
             if (message.startsWith("//")) {
                 messinfo.message = message.substring(1).trim();
             } else if (message.startsWith("/")) {
@@ -279,7 +279,7 @@ export class RoomViewModel extends ViewModel {
                     if (replyingTo) {
                         await replyingTo.reply(msgtype, message);
                     } else {
-                        const res = await this._room.sendEvent("m.room.message", {msgtype, body: message});
+                        const res = await this._room.sendEvent("m.room.message", { msgtype, body: message });
                         return res
                     }
                 }
@@ -354,7 +354,7 @@ export class RoomViewModel extends ViewModel {
             const maxDimension = limit || Math.min(video.maxDimension, 800);
             const thumbnail = await video.scale(maxDimension);
             content.info.thumbnail_info = imageToInfo(thumbnail);
-            attachments["info.thumbnail_url"] = 
+            attachments["info.thumbnail_url"] =
                 this._room.createAttachment(thumbnail.blob, file.name);
             await this._room.sendEvent("m.room.message", content, attachments);
         } catch (err) {
@@ -378,9 +378,12 @@ export class RoomViewModel extends ViewModel {
                 return this._sendFile(file);
             }
             let image = await this.platform.loadImage(file.blob);
-            const limit = await this.platform.settingsStorage.getInt("sentImageSizeLimit");
-            if (limit && image.maxDimension > limit) {
-                const scaledImage = await image.scale(limit);
+            // const limit = await this.platform.settingsStorage.getInt("sentImageSizeLimit") || 1600;
+            const limit = 1 * 1024 * 1024
+            if (image.maxFileSizeLimitaion > limit) {
+                const compressRatio = limit / image.maxFileSizeLimitaion
+                const compressRatioReal = Number(Math.sqrt(compressRatio).toFixed(2))
+                const scaledImage = await image.scale2(compressRatioReal);
                 image.dispose();
                 image = scaledImage;
             }
@@ -395,7 +398,7 @@ export class RoomViewModel extends ViewModel {
             if (image.maxDimension > 600) {
                 const thumbnail = await image.scale(400);
                 content.info.thumbnail_info = imageToInfo(thumbnail);
-                attachments["info.thumbnail_url"] = 
+                attachments["info.thumbnail_url"] =
                     this._room.createAttachment(thumbnail.blob, file.name);
             }
             await this._room.sendEvent("m.room.message", content, attachments);
@@ -426,7 +429,7 @@ export class RoomViewModel extends ViewModel {
             this._composerVM.setReplyingTo(entry);
         }
     }
-    
+
     dismissError() {
         this._sendError = null;
         this.emitChange("error");

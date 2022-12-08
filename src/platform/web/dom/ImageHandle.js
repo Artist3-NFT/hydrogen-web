@@ -34,6 +34,9 @@ export class ImageHandle {
     get maxDimension() {
         return Math.max(this.width, this.height);
     }
+    get maxFileSizeLimitaion() {
+        return this.blob.size
+    }
 
     async _getDomElement() {
         if (!this._domElement) {
@@ -41,7 +44,31 @@ export class ImageHandle {
         }
         return this._domElement;
     }
-
+    async scale2(ratio) {
+        // const aspectRatio = this.width / this.height;
+        // const scaleFactor = Math.min(1, maxDimension / (aspectRatio >= 1 ? this.width : this.height));
+        const scaledWidth = Math.round(this.width * ratio);
+        const scaledHeight = Math.round(this.height * ratio);
+        const canvas = document.createElement("canvas");
+        canvas.width = scaledWidth;
+        canvas.height = scaledHeight;
+        const ctx = canvas.getContext("2d");
+        const drawableElement = await this._getDomElement();
+        ctx.drawImage(drawableElement, 0, 0, scaledWidth, scaledHeight);
+        let mimeType = this.blob.mimeType === "image/jpeg" ? "image/jpeg" : "image/png";
+        let nativeBlob;
+        if (canvas.toBlob) {
+            nativeBlob = await new Promise(resolve => canvas.toBlob(resolve, mimeType));
+        } else if (canvas.msToBlob) {
+            // TODO: provide a mimetype override in blob handle for this case
+            mimeType = "image/png";
+            nativeBlob = canvas.msToBlob();
+        } else {
+            throw new Error("canvas can't be turned into blob");
+        }
+        const blob = BlobHandle.fromBlob(nativeBlob);
+        return new ImageHandle(blob, scaledWidth, scaledHeight, null);
+    }
     async scale(maxDimension) {
         const aspectRatio = this.width / this.height;
         const scaleFactor = Math.min(1, maxDimension / (aspectRatio >= 1 ? this.width : this.height));
