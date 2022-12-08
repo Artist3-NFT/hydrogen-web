@@ -55,7 +55,9 @@ export class TextMessageView extends BaseMessageView {
                 container.appendChild(renderPart(part));
             }
         });
-
+        if (container.innerHTML.includes('@here')) {
+            container.innerHTML = container.innerHTML.replace('@here', `<span class="msg-mention-hightlight">@here</span>`)
+        }
         // container.appendChild(timeContainer);
         if (window.currentRoomMembers) {
             const memberUserNames = window.currentRoomMembers.filter(r => container.innerHTML.includes(`@${r.username}`)).map(u => u.username)

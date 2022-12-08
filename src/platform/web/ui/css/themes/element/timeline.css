@@ -164,12 +164,12 @@ limitations under the License.
     display: none;
 }
 
-.Timeline_message:not(.continuation) {
+.Timeline_message {
     margin-top: 8px;
 }
 
 .Timeline_message.own {
-    margin-top: 4px !important;
+    margin-top: 8px !important;
 }
 
 .ReplyPreviewView .Timeline_message {

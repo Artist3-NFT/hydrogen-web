@@ -139,6 +139,10 @@ export class BaseMessageView extends TemplateView {
                 }
             }
         })
+        const timeTitle = t.div({ className: { hidden: !vm.date, timeTitle: true } });
+        const timeTitleTimer = t.time({ className: {} }, vm.date);
+        timeTitle.appendChild(timeTitleTimer)
+        li.appendChild(timeTitle)
         return li;
     }
 
@@ -220,6 +224,34 @@ export class BaseMessageView extends TemplateView {
 class QuickReactionsMenuOption {
     constructor(vm) {
         this._vm = vm;
+        this._EmkojiReactionPicker = null
+    }
+    closeEmoji(event, thePicker) {
+        if (thePicker?.style?.display !== 'none') {
+            thePicker.style.display = 'none'
+            event?.stopPropagation?.()
+        }
+    }
+    fetchSingleEmoji(vm, evt) {
+        if (!this._EmkojiReactionPicker) {
+            this._EmkojiReactionPicker = new EmojiMart.Picker({
+                previewPosition: 'bottom',
+                onEmojiSelect: (e) => {
+                    vm.react(`${e.native}`)
+                    this.closeEmoji(e, this._EmkojiReactionPicker)
+                },
+                onClickOutside: (e) => this.closeEmoji(e, this._EmkojiReactionPicker)
+            })
+
+            document.body.appendChild(this._EmkojiReactionPicker)
+            this._EmkojiReactionPicker.className = 'reactions-emoji'
+            evt.stopPropagation()
+        } else {
+            if (this._EmkojiReactionPicker.style.display === 'none') {
+                this._EmkojiReactionPicker.style.display = 'flex'
+                evt.stopPropagation()
+            }
+        }
     }
     toDOM(t) {
         const emojiButtons = ["👍", "👎", "😄", "🎉", "😕", "❤️", "🚀", "👀"].map(emoji => {
@@ -227,11 +259,8 @@ class QuickReactionsMenuOption {
         });
         const customButton = t.button({
             className: 'emoji-more',
-            onClick: () => {
-                const key = prompt("Enter your reaction (emoji)");
-                if (key) {
-                    this._vm.react(key);
-                }
+            onClick: (e) => {
+                this.fetchSingleEmoji(this._vm, e)
             }
         }, "…");
         return t.li({ className: "quick-reactions" }, [...emojiButtons, customButton]);
