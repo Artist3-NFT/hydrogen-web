@@ -19,7 +19,8 @@ limitations under the License.
 @import url('inter.css');
 @import url('timeline.css');
 
-#hydrogen-container, #thread-container {
+#hydrogen-container,
+#thread-container {
     font-size: 16px;
     /* Theme aliases */
     --icon-color: var(--background-color-secondary--darker-40);
@@ -869,7 +870,8 @@ button.link {
     cursor: move;
     user-select: none;
 }
-.lightbox .lightbox-image-container .picture{
+
+.lightbox .lightbox-image-container .picture {
     pointer-events: none;
     user-select: none;
     position: absolute;
@@ -903,14 +905,41 @@ button.link {
     display: block;
     grid-area: close;
     justify-self: end;
+    height: 40px;
+    width: 40px;
+    position: relative;
+    outline: none;
+    opacity: 0.8;
+}
+.lightbox .close:hover {
+    opacity: 1;
+}
+
+.lightbox .close::after {
+    content: '';
     background-image: url('icons/dismiss.svg?primary=fixed-white');
     background-position: center;
     background-size: 16px;
     background-repeat: no-repeat;
-    width: 16px;
-    height: 16px;
-    padding: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 99px;
+    height: 40px;
+    width: 40px;
 }
+
+.lightbox .close::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 40px;
+    width: 40px;
+    background: rgba(102, 102, 102, 0.7);
+    border-radius: 99px;
+}
+
 
 .lightbox .details {
     display: none;
@@ -1379,6 +1408,7 @@ ul.menu .menu-item {
 .msg-vertical li.icon.msg-menu-more-pin .menu-item {
     background-image: url('icons/pin.svg?primary=icon-color');
 }
+
 .msg-vertical li.icon.msg-menu-more-emoji .menu-item {
     background-image: url('icons/smile.svg?primary=icon-color');
 }
@@ -1394,6 +1424,7 @@ ul.menu .menu-item {
 .msg-vertical li.icon.msg-menu-more-cp-link .menu-item {
     background-image: url('icons/link-3.svg?primary=icon-color');
 }
+
 .msg-vertical li.icon.msg-menu-more-msg .menu-item {
     background-image: url('icons/msg-user.svg?primary=icon-color');
 }
