@@ -47,9 +47,9 @@ export class Popup {
         this._verticalPadding = verticalPadding;
         this._scroller = findScrollParent(this._target);
         this._view.mount();
+        this._getPopupContainer().appendChild(this._popup);
         const postionRes = this._position();
         if (postionRes) {
-            this._getPopupContainer().appendChild(this._popup);
             if (this._scroller) {
                 document.body.addEventListener("scroll", this, true);
             }
