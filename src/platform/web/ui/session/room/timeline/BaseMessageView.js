@@ -196,9 +196,16 @@ export class BaseMessageView extends TemplateView {
         }
         this.root().classList.add("menuOpen");
         const onClose = () => this.root().classList.remove("menuOpen");
+        const oldMenus = document.querySelectorAll('.popupContainer .msg-vertical')
+        if (oldMenus) {
+            oldMenus.forEach(menu => {
+                menu.parentNode.removeChild(menu)
+            })
+        }
         this._menuPopup = new Popup(new Menu(options, vm.isOwn ? 'msg-vertical is-own-menu' : 'msg-vertical'), onClose);
         this._menuPopup.trackInTemplateView(this);
         this._menuPopup.showRelativeTo(button, 2);
+
     }
 
     createMenuOptions(vm, target) {

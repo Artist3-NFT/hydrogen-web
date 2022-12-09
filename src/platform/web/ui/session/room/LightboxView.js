@@ -22,7 +22,6 @@ let dragingStartX = 0
 let dragingStartY = 0
 export class LightboxView extends TemplateView {
     render(t, vm) {
-
         const wheelFunc = (e) => {
             if (e.deltaY > 0) {
                 zoom += zoomingSpeed

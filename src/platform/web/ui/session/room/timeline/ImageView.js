@@ -22,7 +22,23 @@ import pic from "../../../css/themes/element/icons/default-banner.svg";
 export class ImageView extends BaseMediaView {
     renderMedia(t, vm) {
         const img = t.img({
-            src: vm => vm.thumbnailUrl,
+            src: vm => {
+                if (vm.mimeType === 'image/gif') {
+                    if (window.lightBoxVM) {
+                        window.lightBoxVM = null
+                    }
+                    if (window.lightBoxView) {
+                        window.lightBoxView = null
+                    }
+                    window.lightBoxVM = new LightboxViewModel(Object.assign({}, vm._options, { eventId: vm._entry.id, room: vm._options.room }))
+                    window.lightBoxView = new LightboxView(window.lightBoxVM)
+                    if (window.lightBoxView?._value?.imageUrl) {
+                        return window.lightBoxView._value.imageUrl
+                    }
+                }
+                return vm.thumbnailUrl
+
+            },
             alt: () => '',
             onload: () => {
                 img.style.backgroundImage = 'unset'

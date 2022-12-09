@@ -47,14 +47,16 @@ export class Popup {
         this._verticalPadding = verticalPadding;
         this._scroller = findScrollParent(this._target);
         this._view.mount();
-        this._getPopupContainer().appendChild(this._popup);
-        this._position();
-        if (this._scroller) {
-            document.body.addEventListener("scroll", this, true);
+        const postionRes = this._position();
+        if (postionRes) {
+            this._getPopupContainer().appendChild(this._popup);
+            if (this._scroller) {
+                document.body.addEventListener("scroll", this, true);
+            }
+            setTimeout(() => {
+                document.body.addEventListener("click", this, false);
+            }, 10);
         }
-        setTimeout(() => {
-            document.body.addEventListener("click", this, false);
-        }, 10);
     }
 
     get isOpen() {
