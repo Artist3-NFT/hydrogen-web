@@ -354,6 +354,14 @@ limitations under the License.
     /* Fix for pre overflow */
     min-width: 0;
 }
+.Timeline_messageBody.deleted_message {
+    font-style: italic;
+    background-image: url('icons/slash.svg');
+    padding-left: 24px;
+    background-repeat: no-repeat;
+    background-size: 22px;
+    background-position: 1% 50%;
+}
 
 .hydrogen .AnnouncementView .usercolor1 {
     color: var(--usercolor1);

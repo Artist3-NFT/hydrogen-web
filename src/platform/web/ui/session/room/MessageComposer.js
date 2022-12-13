@@ -65,12 +65,12 @@ export class MessageComposer extends TemplateView {
                 className: "emojiIcon",
                 title: vm.i18n`emoji`,
                 onClick: evt => this._toggleAttachmentEmoji(this._input, evt, vm),
-            }, vm.i18n`Send file`),
+            }),
             t.button({
                 className: "sendFile",
                 title: vm.i18n`Pick attachment`,
                 onClick: evt => this._toggleAttachmentMenu(evt),
-            }, vm.i18n`Send file`),
+            }),
             t.div({ className: 'MessageComposer_input_container' }, [
                 this._input,
                 t.button({

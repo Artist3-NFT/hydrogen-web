@@ -19,7 +19,7 @@ import {Menu} from "../../../general/Menu.js";
 
 export class RedactedView extends BaseMessageView {
     renderMessageBody(t) {
-        return t.p({className: "Timeline_messageBody statusMessage"}, vm => vm.description);
+        return t.p({className: "Timeline_messageBody statusMessage deleted_message"}, vm => vm.description);
     }
 
     createMenuOptions(vm) {
