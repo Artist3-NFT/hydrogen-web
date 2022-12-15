@@ -53,6 +53,7 @@ export class BaseMessageView extends TemplateView {
                 disabled: !this._interactive,
                 haveThread: !!vm.threadAnchor,
                 continuation: vm => vm.isContinuation,
+                replyingContainer: vm => vm.isReply,
             },
             ontouchmove: () => {
                 if (timer) {
@@ -190,7 +191,14 @@ export class BaseMessageView extends TemplateView {
                 e.sendReact = (threadId) => vm.react(threadId)
             }).setIcon('msg-menu-more-thread').setData(`${vm.sender}`));
         }
-        options.push(Menu.option(vm.i18n`Copy message link`, () => { }).setIcon('msg-menu-more-cp-link').setData(`${vm.sender}`));
+        if (vm._format === 'Plain' || vm._format === 'Html') {
+            options.push(Menu.option(vm.i18n`Copy message`, () => {
+                const parts = vm?._messageBody?.parts || []
+                const texts = parts.filter(p => p.text || p.url)
+                const texts2 = texts.map(t => t.url || t.text || '').join('')
+                navigator?.clipboard?.writeText?.(texts2)
+            }).setIcon('msg-menu-more-cp-link').setData(`${vm.sender}`));
+        }
         if (vm.canRedact) {
             options.push(Menu.option(vm.i18n`Delete message`, () => vm.redact()).setDestructive().setIcon('msg-menu-more-del'));
         }
@@ -269,7 +277,7 @@ class QuickReactionsMenuOption {
             onClick: (e) => {
                 this.fetchSingleEmoji(this._vm, e)
             }
-        }, "…");
+        }, "➕");
         return t.li({ className: "quick-reactions" }, [...emojiButtons, customButton]);
     }
 }

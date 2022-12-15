@@ -1399,7 +1399,7 @@ ul.menu .menu-item {
 .msg-vertical li.icon .menu-item {
     background-color: var(--icon-background);
     background-repeat: no-repeat;
-    background-position: right 6% bottom 50%;
+    background-position: right 8px bottom 50%;
     background-size: 18px;
     font-size: 12px;
     line-height: 16px;

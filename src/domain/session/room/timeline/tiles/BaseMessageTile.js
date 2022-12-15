@@ -132,6 +132,9 @@ export class BaseMessageTile extends SimpleTile {
             this._isSameDay = true;
             this.emitChange("isSameDay");
         }
+        if (prev?.isOwn === true && this?.isOwn === true) {
+            isContinuation = true
+        }
     }
 
     updateEntry(entry, param) {

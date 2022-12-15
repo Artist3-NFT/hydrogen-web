@@ -35,7 +35,7 @@ export class BaseMediaView extends BaseMessageView {
         const time = t.span(vm.time);
         const timeContainer = t.time({}, [dateTime, ' ', time])
         const children = [
-            t.div({ className: "spacer", style: spacerStyle }),
+            // t.div({ className: "spacer", style: spacerStyle }),
             this.renderMedia(t, vm),
             // timeContainer
         ];

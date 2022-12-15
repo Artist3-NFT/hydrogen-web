@@ -242,7 +242,10 @@ limitations under the License.
     word-break: break-word;
 }
 
-.Timeline_message:not(.continuation) .Timeline_messageSender,
+.Timeline_message:not(.continuation) .Timeline_messageSender {
+    margin-top: 0px;
+    margin-bottom: 4px;
+}
 .Timeline_message .Timeline_messageBody {
     margin-top: 4px;
 }
@@ -250,7 +253,7 @@ limitations under the License.
 .Timeline_messageOptions3 {
     position: absolute;
     right: 8px;
-    top: 4px;
+    top: 6px;
     width: 16px;
     height: 16px;
     background-image: url('icons/arrow-ios-down.svg');
