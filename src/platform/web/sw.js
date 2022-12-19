@@ -232,7 +232,7 @@ const NOTIF_TAG_NEW_MESSAGE = "new_message";
 
 async function openClientFromNotif(event) {
     if (event.notification.tag !== NOTIF_TAG_NEW_MESSAGE) {
-        console.log("clicked notif with tag", event.notification.tag);
+        // console.log("clicked notif with tag", event.notification.tag);
         return;
     }
     const {sessionId, roomId} = event.notification.data;
@@ -242,7 +242,7 @@ async function openClientFromNotif(event) {
         return await sendAndWaitForReply(client, "hasSessionOpen", {sessionId});
     });
     if (clientWithSession) {
-        console.log("notificationclick: client has session open, showing room there");
+        // console.log("notificationclick: client has session open, showing room there");
         // use a message rather than clientWithSession.navigate here as this refreshes the page on chrome
         clientWithSession.postMessage({type: "openRoom", payload: {roomId}});
         if ('focus' in clientWithSession) {
@@ -251,7 +251,7 @@ async function openClientFromNotif(event) {
             } catch (err) { console.error(err); } // I've had this throw on me on Android
         }
     } else if (self.clients.openWindow) {
-        console.log("notificationclick: no client found with session open, opening new window");
+        // console.log("notificationclick: no client found with session open, opening new window");
         const roomURL = new URL(`./${roomHash}`, baseURL).href;
         await self.clients.openWindow(roomURL);
     }
@@ -263,7 +263,7 @@ self.addEventListener('notificationclick', event => {
 });
 
 async function handlePushNotification(n) {
-    console.log("got a push message", n);
+    // console.log("got a push message", n);
     const sessionId = n.session_id;
     let sender = n.sender_display_name || n.sender;
     if (sender && n.event_id) {
@@ -274,7 +274,7 @@ async function handlePushNotification(n) {
             }
         });
         if (hasFocusedClientOnRoom) {
-            console.log("client is focused, room is open, don't show notif");
+            // console.log("client is focused, room is open, don't show notif");
             return;
         }
         const newMessageNotifs = Array.from(await self.registration.getNotifications({tag: NOTIF_TAG_NEW_MESSAGE}));
@@ -286,15 +286,15 @@ async function handlePushNotification(n) {
         let label;
         let body;
         if (hasMultiNotification) {
-            console.log("already have a multi message, don't do anything");
+            // console.log("already have a multi message, don't do anything");
             return;
         } else if (hasSingleNotifsForRoom) {
-            console.log("showing multi message notification");
+            // console.log("showing multi message notification");
             multi = true;
             label = roomName || sender;
             body = "New messages";
         } else {
-            console.log("showing new message notification");
+            // console.log("showing new message notification");
             if (roomName && roomName !== sender) {
                 label = `${sender} in ${roomName}`;
             } else {

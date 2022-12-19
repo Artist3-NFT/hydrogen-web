@@ -46,7 +46,7 @@ export class ServiceWorkerHandler {
             if (this._registration.waiting && this._registration.active) {
                 this._proposeUpdate();
             }
-            console.log("Service Worker registered");
+            // console.log("Service Worker registered");
         })();
     }
 

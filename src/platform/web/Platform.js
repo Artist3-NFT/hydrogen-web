@@ -263,7 +263,7 @@ export class Platform {
     }
 
     createBlob(buffer, mimetype) {
-        console.log('createBlob:', buffer, mimetype)
+        // console.log('createBlob:', buffer, mimetype)
         return BlobHandle.fromBuffer(buffer, mimetype);
     }
 
@@ -271,7 +271,7 @@ export class Platform {
         if (navigator.msSaveBlob) {
             navigator.msSaveBlob(blobHandle.nativeBlob, filename);
         } else {
-            console.log('saveFileAs:', this._container, this._assetPaths.downloadSandbox, blobHandle, filename, this.isIOS)
+            // console.log('saveFileAs:', this._container, this._assetPaths.downloadSandbox, blobHandle, filename, this.isIOS)
             // downloadInIframe(this._container, this._assetPaths.downloadSandbox, blobHandle, filename, this.isIOS);
         }
     }
@@ -395,7 +395,7 @@ export function tests() {
             logItem.error.stack = "main http://localhost:3000/src/main.js:55\n<anonymous> http://localhost:3000/?loginToken=secret:26"
             logger.persist(logItem, null, false);
             const item = logger._queuedItems.pop();
-            console.log(item);
+            // console.log(item);
             assert.strictEqual(item.json.search("secret"), -1);
         }
     };

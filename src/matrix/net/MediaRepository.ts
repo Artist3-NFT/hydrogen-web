@@ -71,7 +71,7 @@ export class MediaRepository {
     }
     async downloadEncryptedFile(fileEntry: EncryptedFile, cache: boolean = false): Promise<BlobHandle> {
         const url = this.mxcUrl(fileEntry.url);
-        console.log('Download downloadEncryptedFile:', url)
+        // console.log('Download downloadEncryptedFile:', url)
         this.doDownloadWithATag(url)
         // const {body: encryptedBuffer} = await this._platform.request(url, {method: "GET", format: "buffer", cache}).response();
         // const decryptedBuffer = await decryptAttachment(this._platform, encryptedBuffer, fileEntry);
