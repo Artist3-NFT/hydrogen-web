@@ -36,7 +36,7 @@ export class GapTile extends SimpleTile {
             this._showSpinner = true;
             this.emitChange("isLoading");
             try {
-                await this._room.fillGap(this._entry, 10);
+                await this._room.fillGap(this._entry, 20);
             } catch (err) {
                 console.error(`room.fillGap(): ${err.message}:\n${err.stack}`);
                 this._error = err;

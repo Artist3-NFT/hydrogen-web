@@ -41,6 +41,7 @@ import {handleAvatarError} from "./ui/avatar";
 import {ThemeLoader} from "./theming/ThemeLoader";
 
 function addScript(src) {
+    if (src instanceof Object) return 
     return new Promise(function (resolve, reject) {
         var s = document.createElement("script");
         s.setAttribute("src", src );
