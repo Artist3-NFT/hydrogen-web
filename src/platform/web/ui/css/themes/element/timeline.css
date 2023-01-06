@@ -130,6 +130,9 @@ limitations under the License.
     flex-direction: row;
     flex-wrap: wrap;
 }
+.Timeline_message.messageDeleted .timeReactContainer {
+    display: none;
+}
 
 .Timeline_message .timeReactContainer .flex-1 {
     flex: 1;

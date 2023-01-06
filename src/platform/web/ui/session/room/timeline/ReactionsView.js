@@ -25,7 +25,7 @@ export class ReactionsView extends ListView {
             list: reactionsViewModel.reactions,
             onItemClick: reactionView => reactionView.onClick(),
         }
-        super(options, reactionVM => new ReactionView(reactionVM));
+        super(options, (reactionVM) => new ReactionView(reactionVM));
     }
 }
 

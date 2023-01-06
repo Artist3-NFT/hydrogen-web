@@ -25,6 +25,7 @@ export class BaseMessageTile extends SimpleTile {
         this._date = this._entry.timestamp ? new Date(this._entry.timestamp) : null;
         this._isContinuation = false;
         this._isSameDay = false;
+        this._isNewOwn = false;
         this._reactions = null;
         this._threadAnchor = null;
         this._replyTile = null;
@@ -101,7 +102,9 @@ export class BaseMessageTile extends SimpleTile {
     get isSameDay() {
         return this._isSameDay;
     }
-
+    get isNewOwn() {
+        return this._isNewOwn;
+    }
     get isUnverified() {
         return this._entry.isUnverified;
     }
@@ -131,6 +134,10 @@ export class BaseMessageTile extends SimpleTile {
         if (prev && (prev instanceof BaseMessageTile) && prev.date === this.date) {
             this._isSameDay = true;
             this.emitChange("isSameDay");
+        }
+        if (prev && prev.isOwn !== this.isOwn || !prev) {
+            this._isNewOwn = true;
+            this.emitChange("isNewOwn");
         }
         if (prev?.isOwn === true && this?.isOwn === true) {
             isContinuation = true

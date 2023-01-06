@@ -52,8 +52,10 @@ export class BaseMessageView extends TemplateView {
                 unverified: vm.isUnverified,
                 disabled: !this._interactive,
                 haveThread: !!vm.threadAnchor,
+                messageDeleted: vm.shape === "redacted",
                 continuation: vm => vm.isContinuation,
                 replyingContainer: vm => vm.isReply,
+                newOwn: vm => vm.isNewOwn,
             },
             ontouchmove: () => {
                 if (timer) {
@@ -144,6 +146,7 @@ export class BaseMessageView extends TemplateView {
         const timeTitleTimer = t.time({ className: {} }, vm.date);
         timeTitle.appendChild(timeTitleTimer)
         li.appendChild(timeTitle)
+
         return li;
     }
 

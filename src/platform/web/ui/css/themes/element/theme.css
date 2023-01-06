@@ -990,6 +990,7 @@ button.link {
 .menu .quick-reactions button {
     padding: 2px 4px;
     text-align: center;
+    font-size: 2rem;
 }
 
 .InviteView_body {
@@ -1375,7 +1376,7 @@ ul.menu .menu-item {
 }
 
 .msg-hover .quick-reactions {
-    height: 32px;
+    height: 40px;
     display: flex;
     flex-direction: row;
     align-items: center;

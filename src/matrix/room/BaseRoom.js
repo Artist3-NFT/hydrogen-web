@@ -362,7 +362,11 @@ export class BaseRoom extends EventEmitter {
 
     /** @public */
     fillGap(fragmentEntry, amount, log = null) {
-        console.log('ZZQ fillGap:', fragmentEntry, amount)
+        let showMembersEvent = false
+        const hydrogenContainer = document.getElementById('hydrogen-container')
+        if (hydrogenContainer?.classList.contains('welcome-channel')) {
+            showMembersEvent = true
+        }
         // TODO move some/all of this out of BaseRoom
         return this._platform.logger.wrapOrRun(log, "fillGap", async log => {
             log.set("id", this.id);
@@ -379,7 +383,7 @@ export class BaseRoom extends EventEmitter {
                 filter: {
                     lazy_load_members: true,
                     include_redundant_members: true,
-                    not_types: ['m.room.member']
+                    not_types: showMembersEvent?[]:['m.room.member']
                 }
             }, { log }).response();
 
