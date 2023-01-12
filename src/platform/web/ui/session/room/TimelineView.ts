@@ -49,6 +49,7 @@ function bottom(node: HTMLElement): number {
 function findFirstNodeIndexAtOrBelow(tiles: HTMLElement, top: number, startIndex: number = (tiles.children.length - 1)): number {
     for (var i = startIndex; i >= 0; i--) {
         const node = tiles.children[i] as HTMLElement;
+        if (node.classList.contains('hidden')) continue;
         if (node.offsetTop < top) {
             return i;
         }
@@ -125,6 +126,7 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
 
     private restoreScrollPosition() {
         const {scrollNode, tilesNode} = this;
+        // console.log("ZZQ restoreScrollPosition", scrollNode, tilesNode, this.anchoredNode)
 
         const missingTilesHeight = scrollNode.clientHeight - tilesNode.clientHeight;
         if (missingTilesHeight > 0) {
@@ -138,6 +140,7 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
                 scrollNode.scrollTop = scrollNode.scrollHeight;
             } else if (this.anchoredNode) {
                 const newAnchoredBottom = bottom(this.anchoredNode!);
+                // console.log("ZZQ newAnchoredBottom", newAnchoredBottom, this.anchoredBottom)
                 if (newAnchoredBottom !== this.anchoredBottom) {
                     const bottomDiff = newAnchoredBottom - this.anchoredBottom;
                     // scrollBy tends to create less scroll jumps than reassigning scrollTop as it does
@@ -159,7 +162,6 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
     private onScroll(): void {
         const {scrollNode, tilesNode} = this;
         const {scrollHeight, scrollTop, clientHeight} = scrollNode;
-
         let bottomNodeIndex;
         this.stickToBottom = Math.abs(scrollHeight - (scrollTop + clientHeight)) < 1;
         if (this.stickToBottom) {

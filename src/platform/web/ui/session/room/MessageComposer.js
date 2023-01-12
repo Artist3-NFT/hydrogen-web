@@ -77,6 +77,7 @@ export class MessageComposer extends TemplateView {
                     id: 'main_send_button',
                     className: "send",
                     onClick: async (event) => {
+                        event.mData2 = this._input.value
                         event.onDataGet = (newMessageData) => {
                             event.mData = newMessageData
                         }
@@ -135,6 +136,7 @@ export class MessageComposer extends TemplateView {
         if (event.key === "Enter" && !event.shiftKey) {
             // don't insert newline into composer
             event.preventDefault();
+            event.mData2 = this._input.value
             event.onDataGet = (newMessageData) => {
                 event.mData = newMessageData
             }

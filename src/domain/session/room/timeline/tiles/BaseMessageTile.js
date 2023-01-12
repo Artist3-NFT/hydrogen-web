@@ -18,6 +18,7 @@ import { SimpleTile } from "./SimpleTile.js";
 import { ReactionsViewModel } from "../ReactionsViewModel.js";
 import { getIdentifierColorNumber, avatarInitials, getAvatarHttpUrl } from "../../../../avatar";
 import { ObservableMap } from "../../../../../observable/map/ObservableMap";
+import { RoomMemberTile } from "./RoomMemberTile.js";
 
 export class BaseMessageTile extends SimpleTile {
     constructor(entry, options) {
@@ -131,7 +132,7 @@ export class BaseMessageTile extends SimpleTile {
             this._isContinuation = isContinuation;
             this.emitChange("isContinuation");
         }
-        if (prev && (prev instanceof BaseMessageTile) && prev.date === this.date) {
+        if (prev && (prev instanceof BaseMessageTile || prev instanceof RoomMemberTile) && prev.date === this.date) {
             this._isSameDay = true;
             this.emitChange("isSameDay");
         }
