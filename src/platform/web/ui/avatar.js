@@ -43,6 +43,11 @@ export function renderImg(vm, size) {
     const sizeStr = size.toString();
     return tag.img({src: vm.avatarUrl(size), width: sizeStr, height: sizeStr, title: vm.avatarTitle});
 }
+export function renderDefaultImg(vm, size) {
+    const sizeStr = size.toString();
+    const defaultUrl = '';
+    return tag.img({src: vm.avatarUrl(size), width: sizeStr, height: sizeStr, title: vm.avatarTitle});
+}
 
 function isAvatarEvent(e) {
     const element = e.target;

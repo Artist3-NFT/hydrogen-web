@@ -387,7 +387,7 @@ export class BaseRoom extends EventEmitter {
                 }
             }, { log }).response();
 
-            console.log('ZZQ fillGap response: got, ', response)
+            // console.log('ZZQ fillGap response: got, ', response)
             const txn = await this._storage.readWriteTxn([
                 this._storage.storeNames.pendingEvents,
                 this._storage.storeNames.timelineEvents,

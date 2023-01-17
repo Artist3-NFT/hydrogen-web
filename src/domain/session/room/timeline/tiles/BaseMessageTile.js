@@ -56,7 +56,12 @@ export class BaseMessageTile extends SimpleTile {
     }
 
     get displayName() {
-        return this._entry.displayName || this.sender;
+        const res = this._entry.displayName || this.sender
+        if (res.indexOf('@u_') >= 0) {
+            const id = res.split(':')[0].replace('@u_', 'GG')
+            return id;
+        }
+        return res;
     }
 
     get sender() {
