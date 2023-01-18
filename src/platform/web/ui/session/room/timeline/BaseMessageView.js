@@ -189,9 +189,12 @@ export class BaseMessageView extends TemplateView {
         }
         options.push(Menu.option(vm.i18n`Reply`, () => vm.startReply()).setIcon('msg-menu-more-reply'));
         options.push(Menu.option(vm.i18n`Add reaction`, () => this._toggleEmojiMenu(button, vm)).setIcon('msg-menu-more-emoji'));
-        if (!vm.threadAnchor) {
+        if (!vm.threadAnchor && vm._getContent().msgtype === 'm.text') {
             options.push(Menu.option(vm.i18n`Create thread`, (e) => {
                 e.sendReact = (threadId) => vm.react(threadId)
+                e.eventId = vm.eventId
+                e.userId = vm.sender
+                e.content = vm._getContent()
             }).setIcon('msg-menu-more-thread').setData(`${vm.sender}`));
         }
         if (vm._format === 'Plain' || vm._format === 'Html') {

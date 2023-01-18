@@ -191,10 +191,10 @@ export class Sync {
             const filterContent = {
                 room: {
                     // account_data: { not_types: ['*'] },
-                    // ephemeral: { not_types: ['*'] },
-                    // state: { not_types: ['*'] },
-                    // timeline: { types: ['m.room.message', 'm.room.member', 'm.reaction'], limit: 10, lazy_load_members: true }
-                    timeline: { limit: 10, lazy_load_members: true }
+                    ephemeral: { not_types: ['*'] },
+                    state: { lazy_load_members: true },
+                    timeline: { types: ['m.room.message', 'm.room.member', 'm.reaction'], limit: 1, lazy_load_members: true }
+                    // timeline: { limit: 5, lazy_load_members: true }
                 },
                 presence: { not_types: ['m.presence'] },
             }
