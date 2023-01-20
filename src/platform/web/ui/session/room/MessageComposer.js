@@ -108,6 +108,10 @@ export class MessageComposer extends TemplateView {
     }
 
     async _trySend() {
+        const hydrogenContainer = document.getElementById('hydrogen-container')
+        if (hydrogenContainer?.classList.contains('BRC') && !hydrogenContainer?.classList.contains('hydrogen-dm')) {
+            return
+        }
         this._input.focus();
         // we clear the composer while enqueuing
         // and restore it when that didn't work somehow

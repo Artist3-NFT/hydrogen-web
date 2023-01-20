@@ -55,6 +55,10 @@ export class ReactionsViewModel {
         for (const existingKey of this._map.keys()) {
             const hasPending = pendingAnnotations?.has(existingKey);
             const hasRemote = annotations?.hasOwnProperty(existingKey);
+            if (this._map.get(existingKey).count <= 0) {
+                this._map.remove(existingKey);
+                continue;
+            }
             if (!hasRemote && !hasPending) {
                 this._map.remove(existingKey);
             } else if (!hasRemote) {
