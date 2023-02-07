@@ -31,7 +31,7 @@ export class MessageComposer extends TemplateView {
 
     render(t, vm) {
         this._input = t.textarea({
-            onKeydown: e => this._onKeyDown(e),
+            onKeydown: e => this._onKeyDown(e, vm),
             onInput: () => {
                 vm.setInput(this._input.value);
                 if (this._input.value) {
@@ -77,6 +77,9 @@ export class MessageComposer extends TemplateView {
                     id: 'main_send_button',
                     className: "send",
                     onClick: async (event) => {
+                        if (!!vm.replyViewModel) {
+                            event.replingSender = vm.replyViewModel.sender
+                        }
                         event.mData2 = this._input.value
                         event.onDataGet = (newMessageData) => {
                             event.mData = newMessageData
@@ -136,9 +139,12 @@ export class MessageComposer extends TemplateView {
         }
     }
 
-    async _onKeyDown(event) {
+    async _onKeyDown(event, vm) {
         if (event.key === "Enter" && !event.shiftKey) {
             // don't insert newline into composer
+            if (!!vm.replyViewModel) {
+                event.replingSender = vm.replyViewModel.sender
+            }
             event.preventDefault();
             event.mData2 = this._input.value
             event.onDataGet = (newMessageData) => {
@@ -193,9 +199,9 @@ export class MessageComposer extends TemplateView {
         } else {
             const vm = this.value;
             this._attachmentPopup = new Popup(new Menu([
-                Menu.option(vm.i18n`Video`, () => vm.sendVideo()).setIcon("video"),
-                Menu.option(vm.i18n`Photo`, () => vm.sendPicture()).setIcon("picture"),
-                Menu.option(vm.i18n`Document`, () => vm.sendFile()).setIcon("file"),
+                Menu.option(vm.i18n`Video`, (e) => vm.sendVideo(e)).setIcon("video"),
+                Menu.option(vm.i18n`Photo`, (e) => vm.sendPicture(e)).setIcon("picture").setButtonClassName('sending-attach-picture'),
+                Menu.option(vm.i18n`Document`, (e) => vm.sendFile(e)).setIcon("file").setButtonClassName('sending-attach-file'),
                 Menu.option(vm.i18n`Token`, () => { }).setIcon("token"),
             ], 'bottom-menu'));
             this._attachmentPopup.trackInTemplateView(this);

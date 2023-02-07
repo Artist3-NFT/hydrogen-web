@@ -295,12 +295,13 @@ export class RoomViewModel extends ViewModel {
         return false;
     }
 
-    async _pickAndSendFile() {
+    async _pickAndSendFile(event) {
         try {
             const file = await this.platform.openFile();
             if (!file) {
                 return;
             }
+            event.attachSent = true
             return this._sendFile(file);
         } catch (err) {
             console.error(err);
@@ -357,6 +358,7 @@ export class RoomViewModel extends ViewModel {
             attachments["info.thumbnail_url"] =
                 this._room.createAttachment(thumbnail.blob, file.name);
             await this._room.sendEvent("m.room.message", content, attachments);
+            event.attachSent = true
         } catch (err) {
             this._sendError = err;
             this.emitChange("error");
@@ -364,7 +366,7 @@ export class RoomViewModel extends ViewModel {
         }
     }
 
-    async _pickAndSendPicture() {
+    async _pickAndSendPicture(event) {
         try {
             if (!this.platform.hasReadPixelPermission()) {
                 alert("Please allow canvas image data access, so we can scale your images down.");
@@ -402,6 +404,7 @@ export class RoomViewModel extends ViewModel {
                     this._room.createAttachment(thumbnail.blob, file.name);
             }
             await this._room.sendEvent("m.room.message", content, attachments);
+            event.attachSent = true
         } catch (err) {
             this._sendError = err;
             this.emitChange("error");

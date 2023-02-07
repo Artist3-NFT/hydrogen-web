@@ -194,7 +194,9 @@ export class BaseMessageView extends TemplateView {
                 e.sendReact = (threadId) => vm.react(threadId)
                 e.eventId = vm.eventId
                 e.userId = vm.sender
-                e.content = vm._getContent()
+                // console.log('vm', vm, vm.body?.parts?.[0]?.text)
+                e.content = vm.body?.parts?.[0]?.text
+                // e.content = vm._getContent()
             }).setIcon('msg-menu-more-thread').setData(`${vm.sender}`));
         }
         if (vm._format === 'Plain' || vm._format === 'Html') {
@@ -276,11 +278,15 @@ class QuickReactionsMenuOption {
     }
     toDOM(t) {
         const emojiButtons = ["👍", "👎", "😄", "🎉", "😕", "❤️", "🚀", "👀"].map(emoji => {
-            return t.button({ onClick: () => this._vm.react(emoji) }, emoji);
+            return t.button({ onClick: (e) => {
+                e.reactingSender = this._vm.sender
+                this._vm.react(emoji)
+            } }, emoji);
         });
         const customButton = t.button({
             className: 'emoji-more',
             onClick: (e) => {
+                e.reactingSender = this._vm.sender
                 this.fetchSingleEmoji(this._vm, e)
             }
         }, "➕");

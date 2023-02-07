@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {ListView} from "../../../general/ListView";
-import {TemplateView} from "../../../general/TemplateView";
+import { ListView } from "../../../general/ListView";
+import { TemplateView } from "../../../general/TemplateView";
 
 export class ReactionsView extends ListView {
     constructor(reactionsViewModel) {
@@ -36,6 +36,9 @@ class ReactionView extends TemplateView {
                 active: vm => vm.isActive,
                 pending: vm => vm.isPending
             },
+            onClick: (e) => {
+                e.reactingSender = vm._parentTile.sender
+            }
         }, [vm.key, " ", vm => `${vm.count}`]);
     }
 
