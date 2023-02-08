@@ -62,6 +62,15 @@ export class ComposerViewModel extends ViewModel {
     sendPicture(e) {
         this._roomVM._pickAndSendPicture(e);
     }
+    sendPictureOrFileByPaste(file) {
+        this._roomVM._pickAndSendPictureByPaste(file);
+    }
+    async sendMultiPictureOrFileByPaste(files) {
+        for (let index = 0; index < files.length; index++) {
+            const element = files[index];
+            await this._roomVM._pickAndSendPictureByPaste(element);
+        }
+    }
 
     sendFile(e) {
         this._roomVM._pickAndSendFile(e);

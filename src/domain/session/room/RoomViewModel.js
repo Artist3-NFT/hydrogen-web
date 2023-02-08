@@ -24,6 +24,7 @@ import { imageToInfo } from "../common.js";
 // this is a breaking SDK change though to make this option mandatory
 import { tileClassForEntry as defaultTileClassForEntry } from "./timeline/tiles/index";
 import { RoomStatus } from "../../../matrix/room/common";
+import { BlobHandle } from "../../../platform/web/dom/BlobHandle.js";
 
 export class RoomViewModel extends ViewModel {
     constructor(options) {
@@ -405,6 +406,52 @@ export class RoomViewModel extends ViewModel {
             }
             await this._room.sendEvent("m.room.message", content, attachments);
             event.attachSent = true
+        } catch (err) {
+            this._sendError = err;
+            this.emitChange("error");
+            console.error(err.stack);
+        }
+    }
+    async _pickAndSendPictureByPaste(filepre) {
+        try {
+            if (!this.platform.hasReadPixelPermission()) {
+                alert("Please allow canvas image data access, so we can scale your images down.");
+                return;
+            }
+            const file = {name: filepre.name, blob: BlobHandle.fromBlob(filepre)};
+            // const file = await this.platform.openFile("image/*");
+            if (!file) {
+                return;
+            }
+            if (!file.blob.mimeType.startsWith("image/")) {
+                return this._sendFile(file);
+            }
+            let image = await this.platform.loadImage(file.blob);
+            // const limit = await this.platform.settingsStorage.getInt("sentImageSizeLimit") || 1600;
+            const limit = 1 * 1024 * 1024
+            if (image.maxFileSizeLimitaion > limit) {
+                const compressRatio = limit / image.maxFileSizeLimitaion
+                const compressRatioReal = Number(Math.sqrt(compressRatio).toFixed(2))
+                const scaledImage = await image.scale2(compressRatioReal);
+                image.dispose();
+                image = scaledImage;
+            }
+            const content = {
+                body: file.name,
+                msgtype: "m.image",
+                info: imageToInfo(image)
+            };
+            const attachments = {
+                "url": this._room.createAttachment(image.blob, file.name),
+            };
+            if (image.maxDimension > 600) {
+                const thumbnail = await image.scale(400);
+                content.info.thumbnail_info = imageToInfo(thumbnail);
+                attachments["info.thumbnail_url"] =
+                    this._room.createAttachment(thumbnail.blob, file.name);
+            }
+            await this._room.sendEvent("m.room.message", content, attachments);
+            // event.attachSent = true
         } catch (err) {
             this._sendError = err;
             this.emitChange("error");

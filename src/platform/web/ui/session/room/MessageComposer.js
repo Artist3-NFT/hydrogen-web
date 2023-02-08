@@ -40,6 +40,35 @@ export class MessageComposer extends TemplateView {
                     this._clearHeight();
                 }
             },
+            onpaste: (e) => {
+                if (e.clipboardData.items.length > 0) {
+                    const clipedFilesArr = []
+                    for (let index = 0; index < e.clipboardData.items.length; index++) {
+                        const item = e.clipboardData.items[index];
+                        const gotFile = item.getAsFile()
+                        if (item.kind === 'file' && gotFile) {
+                            clipedFilesArr.push(gotFile)
+                        }
+                    }
+                    if (clipedFilesArr.length > 0) {
+                        e.sendFunc2 = () => vm.sendMultiPictureOrFileByPaste(clipedFilesArr)
+                        e.sendFunc = vm.sendMultiPictureOrFileByPaste
+                        e.sendData = clipedFilesArr
+                        // if (clipedFilesArr.length === 1) {
+                        //     vm.sendPictureOrFileByPaste(clipedFilesArr[0])
+                        //     e.preventDefault()
+                        // } else {
+                        //     vm.sendMultiPictureOrFileByPaste(clipedFilesArr)
+                        //     e.preventDefault()
+                        // }
+                    }
+                }
+
+                // console.log('eee', e, e.clipboardData.items.length)
+                // for (const item of e.clipboardData.items) {
+                //     console.log('1111', item.kind, item.type, item)
+                // }
+            },
             id: 'main_input',
             placeholder: vm => vm.isEncrypted ? "Send an encrypted message…" : "Send a message…",
             rows: "1"
