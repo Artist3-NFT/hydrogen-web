@@ -14,20 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {ListView} from "../../general/ListView";
-import type {IView} from "../../general/types";
-import {TemplateView, Builder} from "../../general/TemplateView";
-import {IObservableValue} from "../../general/BaseUpdateView";
-import {MissingAttachmentView} from "./timeline/MissingAttachmentView.js";
-import {AnnouncementView} from "./timeline/AnnouncementView.js";
-import {RedactedView} from "./timeline/RedactedView.js";
-import {SimpleTile} from "../../../../../domain/session/room/timeline/tiles/SimpleTile.js";
-import {BaseObservableList as ObservableList} from "../../../../../observable/list/BaseObservableList";
+import { ListView } from "../../general/ListView";
+import type { IView } from "../../general/types";
+import { TemplateView, Builder } from "../../general/TemplateView";
+import { IObservableValue } from "../../general/BaseUpdateView";
+import { MissingAttachmentView } from "./timeline/MissingAttachmentView.js";
+import { AnnouncementView } from "./timeline/AnnouncementView.js";
+import { RedactedView } from "./timeline/RedactedView.js";
+import { SimpleTile } from "../../../../../domain/session/room/timeline/tiles/SimpleTile.js";
+import { BaseObservableList as ObservableList } from "../../../../../observable/list/BaseObservableList";
 
 export interface TileView extends IView {
     readonly value: SimpleTile;
     onClick(event: UIEvent);
-} 
+}
 export type TileViewConstructor = new (
     tile: SimpleTile,
     viewClassForTile: ViewClassForEntryFn,
@@ -111,7 +111,7 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
     }
 
     private jumpDown() {
-        const {scrollNode} = this;
+        const { scrollNode } = this;
         this.stickToBottom = true;
         scrollNode.scrollTop = scrollNode.scrollHeight;
     }
@@ -125,7 +125,7 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
     }
 
     private restoreScrollPosition() {
-        const {scrollNode, tilesNode} = this;
+        const { scrollNode, tilesNode } = this;
         // console.log("ZZQ restoreScrollPosition", scrollNode, tilesNode, this.anchoredNode)
 
         const missingTilesHeight = scrollNode.clientHeight - tilesNode.clientHeight;
@@ -160,8 +160,8 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
     }
 
     private onScroll(): void {
-        const {scrollNode, tilesNode} = this;
-        const {scrollHeight, scrollTop, clientHeight} = scrollNode;
+        const { scrollNode, tilesNode } = this;
+        const { scrollHeight, scrollTop, clientHeight } = scrollNode;
         let bottomNodeIndex;
         this.stickToBottom = Math.abs(scrollHeight - (scrollTop + clientHeight)) < 1;
         if (this.stickToBottom) {

@@ -87,3 +87,35 @@ limitations under the License.
 .TimelineLoadingView> :not(:first-child) {
     margin-left: 12px;
 }
+.draging-area {
+    height: 0px;
+    position: relative;
+    width: 100%;
+    overflow: visible;
+}
+.draging-area-inner {
+    display: none;
+}
+.draging .draging-area-inner {
+    display: flex;
+}
+.draging-area-inner {
+    height: 320px;
+    position: absolute;
+    bottom: 0;
+    margin: 24px;
+    width: calc(100% - 48px);
+    background-color: #2A2A2A;
+    border-radius: 16px;
+}
+.draging-area-inner2 {
+    border: 2px dashed #4A4A4A;
+    margin: 24px;
+    border-radius: 16px;
+}
+.draging-area-logo {
+    background-image: url("./icons/file.svg?primary=icon-color");
+    background-repeat: no-repeat;
+    height: 64px;
+    width: 64px;
+}
