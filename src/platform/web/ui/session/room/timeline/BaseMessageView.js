@@ -183,7 +183,9 @@ export class BaseMessageView extends TemplateView {
     }
     _toggleMenuMore(button, vm) {
         const options = [];
-        options.push(Menu.option(vm.i18n`Pin message`, () => { }).setIcon('msg-menu-more-pin').setData(`${vm.sender}`));
+        options.push(Menu.option(vm.i18n`Pin message`, () => {
+            vm._roomVM._setPinnedMessage(vm.eventId)
+        }).setIcon('msg-menu-more-pin').setData(`${vm.sender}`));
         if (!vm.isOwn) {
             options.push(Menu.option(vm.i18n`Message user`, () => { }).setIcon('msg-menu-more-msg').setData(`${vm.sender}`));
         }

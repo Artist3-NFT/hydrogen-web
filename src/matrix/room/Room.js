@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {BaseRoom} from "./BaseRoom.js";
-import {SyncWriter} from "./timeline/persistence/SyncWriter.js";
-import {MemberWriter} from "./timeline/persistence/MemberWriter.js";
-import {RelationWriter} from "./timeline/persistence/RelationWriter.js";
-import {SendQueue} from "./sending/SendQueue.js";
-import {WrappedError} from "../error.js"
-import {Heroes} from "./members/Heroes.js";
-import {AttachmentUpload} from "./AttachmentUpload.js";
-import {DecryptionSource} from "../e2ee/common.js";
-import {PowerLevels, EVENT_TYPE as POWERLEVELS_EVENT_TYPE } from "./PowerLevels.js";
+import { BaseRoom } from "./BaseRoom.js";
+import { SyncWriter } from "./timeline/persistence/SyncWriter.js";
+import { MemberWriter } from "./timeline/persistence/MemberWriter.js";
+import { RelationWriter } from "./timeline/persistence/RelationWriter.js";
+import { SendQueue } from "./sending/SendQueue.js";
+import { WrappedError } from "../error.js"
+import { Heroes } from "./members/Heroes.js";
+import { AttachmentUpload } from "./AttachmentUpload.js";
+import { DecryptionSource } from "../e2ee/common.js";
+import { PowerLevels, EVENT_TYPE as POWERLEVELS_EVENT_TYPE } from "./PowerLevels.js";
 
 const EVENT_ENCRYPTED_TYPE = "m.room.encrypted";
 
@@ -31,7 +31,7 @@ export class Room extends BaseRoom {
     constructor(options) {
         super(options);
         // TODO: pass pendingEvents to start like pendingOperations?
-        const {pendingEvents} = options;
+        const { pendingEvents } = options;
         const relationWriter = new RelationWriter({
             roomId: this.id,
             fragmentIdComparer: this._fragmentIdComparer,
@@ -43,7 +43,7 @@ export class Room extends BaseRoom {
             relationWriter,
             memberWriter: new MemberWriter(this.id)
         });
-        this._sendQueue = new SendQueue({roomId: this.id, storage: this._storage, hsApi: this._hsApi, pendingEvents});
+        this._sendQueue = new SendQueue({ roomId: this.id, storage: this._storage, hsApi: this._hsApi, pendingEvents });
     }
 
     _setEncryption(roomEncryption) {
@@ -112,7 +112,7 @@ export class Room extends BaseRoom {
     }
 
     /** @package */
-    async writeSync(roomResponse, isInitialSync, {summaryChanges, decryptChanges, roomEncryption, retryEntries}, txn, log) {
+    async writeSync(roomResponse, isInitialSync, { summaryChanges, decryptChanges, roomEncryption, retryEntries }, txn, log) {
         log.set("id", this.id);
         const isRejoin = summaryChanges.isNewJoin(this._summary.data);
         if (isRejoin) {
@@ -121,7 +121,7 @@ export class Room extends BaseRoom {
             txn.roomState.removeAllForRoom(this.id);
             txn.roomMembers.removeAllForRoom(this.id);
         }
-        const {entries: newEntries, updatedEntries, newLiveKey, memberChanges} =
+        const { entries: newEntries, updatedEntries, newLiveKey, memberChanges } =
             await log.wrap("syncWriter", log => this._syncWriter.writeSync(
                 roomResponse, isRejoin, summaryChanges.hasFetchedMembers, txn, log), log.level.Detail);
         if (decryptChanges) {
@@ -149,7 +149,7 @@ export class Room extends BaseRoom {
         // also apply (decrypted) timeline entries to the summary changes
         summaryChanges = summaryChanges.applyTimelineEntries(
             allEntries, isInitialSync, !this._isTimelineOpen, this._user.id);
-        
+
         // if we've have left the room, remove the summary
         if (summaryChanges.membership !== "join") {
             txn.roomSummary.remove(this.id);
@@ -291,7 +291,7 @@ export class Room extends BaseRoom {
         }
     }
 
-    needsAfterSyncCompleted({encryptionChanges}) {
+    needsAfterSyncCompleted({ encryptionChanges }) {
         return encryptionChanges?.shouldFlush;
     }
 
@@ -319,7 +319,7 @@ export class Room extends BaseRoom {
                 });
             }
         }
-        
+
         this._sendQueue.resumeSending(parentLog);
     }
 
@@ -348,6 +348,32 @@ export class Room extends BaseRoom {
             log.set("id", this.id);
             return this._sendQueue.enqueueEvent(eventType, content, attachments, log);
         });
+    }
+    /** @public */
+    setState(eventType, stateKey, content, log = null) {
+        return this._hsApi.setState(this._roomId, eventType, stateKey, content)
+    }
+    /** @public */
+    async getState(eventType, stateKey, content, log = null) {
+        try {
+            const stateReqPre = this._hsApi.state(this._roomId, eventType, stateKey, content)
+            const stateReq = await stateReqPre.response()
+            console.log('stateReq:', stateReq)
+            const txn = await this._storage.readWriteTxn([
+                this._storage.storeNames.roomState,
+            ]);
+            console.log(':",', { state_key: "", type: eventType, content: stateReq })
+            await txn.roomState.set(this._roomId, { state_key: "", type: eventType, content: stateReq })
+            return stateReq;
+        } catch (e) { 
+            return null
+        }
+    }
+    async loadStateFromIDB(eventType) {
+        const txn = await this._storage.readTxn([
+            this._storage.storeNames.roomState,
+        ]);
+        return await txn.roomState.get(this._roomId, eventType, '')
     }
 
     /** @public */
@@ -380,7 +406,7 @@ export class Room extends BaseRoom {
     get notificationCount() {
         return this._summary.data.notificationCount;
     }
-    
+
     get highlightCount() {
         return this._summary.data.highlightCount;
     }
@@ -417,7 +443,7 @@ export class Room extends BaseRoom {
                 await txn.complete();
                 this._summary.applyChanges(data);
                 this._emitUpdate();
-                
+
                 try {
                     const lastEventId = await this._getLastEventId();
                     if (lastEventId) {
@@ -436,7 +462,7 @@ export class Room extends BaseRoom {
     leave(log = null) {
         return this._platform.logger.wrapOrRun(log, "leave room", async log => {
             log.set("id", this.id);
-            await this._hsApi.leave(this.id, {log}).response();
+            await this._hsApi.leave(this.id, { log }).response();
         });
     }
 
@@ -456,7 +482,7 @@ export class Room extends BaseRoom {
     }
 
     createAttachment(blob, filename) {
-        return new AttachmentUpload({blob, filename, platform: this._platform});
+        return new AttachmentUpload({ blob, filename, platform: this._platform });
     }
 
     dispose() {

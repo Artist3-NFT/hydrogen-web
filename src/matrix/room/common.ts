@@ -23,6 +23,7 @@ export function getPrevContentFromStateEvent(event) {
 }
 
 export const REDACTION_TYPE = "m.room.redaction";
+export const PINNED_MESSAGE_TYPE = "m.room.pinned_events";
 
 export function isRedacted(event) {
     return !!event?.unsigned?.redacted_because;

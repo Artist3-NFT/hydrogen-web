@@ -23,7 +23,7 @@ import { imageToInfo } from "../common.js";
 // TODO: remove fallback so default isn't included in bundle for SDK users that have their custom tileClassForEntry
 // this is a breaking SDK change though to make this option mandatory
 import { tileClassForEntry as defaultTileClassForEntry } from "./timeline/tiles/index";
-import { RoomStatus } from "../../../matrix/room/common";
+import { PINNED_MESSAGE_TYPE, RoomStatus } from "../../../matrix/room/common";
 import { BlobHandle } from "../../../platform/web/dom/BlobHandle.js";
 
 export class RoomViewModel extends ViewModel {
@@ -265,6 +265,38 @@ export class RoomViewModel extends ViewModel {
         return { type: msgtype, message: message };
     }
 
+    async _setPinnedMessage(eventId) {
+        if (!this._room.isArchived && eventId) {
+            try {
+                await this.updatePinnedMessage()
+                const exists = await this._room.loadStateFromIDB(PINNED_MESSAGE_TYPE)
+                if (exists?.event?.content?.pinned?.length > 0) {
+                    const oldEvents = new Set(exists?.event?.content?.pinned)
+                    if (oldEvents.has(eventId)) {
+                        oldEvents.delete(eventId)
+                    } else {
+                        oldEvents.add(eventId)
+                    }
+                    await this._room.setState(PINNED_MESSAGE_TYPE, '', { pinned: [...oldEvents] });
+                } else {
+                    await this._room.setState(PINNED_MESSAGE_TYPE, '', { pinned: [eventId] });
+                }
+                return true;
+            } catch (err) {
+                console.error(`room.setPinnedMessage(): ${err.message}:\n${err.stack}`);
+                this._sendError = err;
+                this._timelineError = null;
+                this.emitChange("error");
+                return false;
+            }
+        }
+    }
+    async updatePinnedMessage() {
+        if (!this._room.isArchived) {
+            const res = await this._room.getState(PINNED_MESSAGE_TYPE, '');
+            return res
+        }
+    }
     async _sendMessage(message, replyingTo) {
         if (!this._room.isArchived && message) {
             let messinfo = { type: "m.text", message: message };
@@ -418,7 +450,7 @@ export class RoomViewModel extends ViewModel {
                 alert("Please allow canvas image data access, so we can scale your images down.");
                 return;
             }
-            const file = {name: filepre.name, blob: BlobHandle.fromBlob(filepre)};
+            const file = { name: filepre.name, blob: BlobHandle.fromBlob(filepre) };
             // const file = await this.platform.openFile("image/*");
             if (!file) {
                 return;
