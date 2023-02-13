@@ -21,6 +21,8 @@ import { TemplateView } from "../../../general/TemplateView";
 import { Popup } from "../../../general/Popup.js";
 import { Menu } from "../../../general/Menu.js";
 import { ReactionsView } from "./ReactionsView.js";
+import { TextTile } from "../../../../../../domain/session/room/timeline/tiles/TextTile";
+import { PINNED_MESSAGE_TYPE } from "../../../../../../matrix/room/common";
 
 export class BaseMessageView extends TemplateView {
     constructor(value, viewClassForTile, renderFlags, tagName = "li") {
@@ -181,11 +183,23 @@ export class BaseMessageView extends TemplateView {
         this._menuPopup.trackInTemplateView(this);
         this._menuPopup.showRelativeTo(button, 2);
     }
-    _toggleMenuMore(button, vm) {
+    async _toggleMenuMore(button, vm) {
         const options = [];
-        options.push(Menu.option(vm.i18n`Pin message`, () => {
-            vm._roomVM._setPinnedMessage(vm.eventId)
-        }).setIcon('msg-menu-more-pin').setData(`${vm.sender}`));
+        if (vm instanceof TextTile) {
+            const exists = await vm._room.loadStateFromIDB(PINNED_MESSAGE_TYPE)
+            const roomPinnedMessages = exists?.event?.content?.pinned || []
+            const currentEventId = vm?.eventId || ''
+            const alreadyPinned = !!roomPinnedMessages.find(m => m === currentEventId)
+            if (alreadyPinned) {
+                options.push(Menu.option(vm.i18n`Unpin message`, () => {
+                    vm._roomVM._setPinnedMessage(vm.eventId)
+                }).setIcon('msg-menu-more-pin').setData(`${vm.sender}`));
+            } else {
+                options.push(Menu.option(vm.i18n`Pin message`, () => {
+                    vm._roomVM._setPinnedMessage(vm.eventId)
+                }).setIcon('msg-menu-more-pin').setData(`${vm.sender}`));
+            }
+        }
         if (!vm.isOwn) {
             options.push(Menu.option(vm.i18n`Message user`, () => { }).setIcon('msg-menu-more-msg').setData(`${vm.sender}`));
         }

@@ -358,11 +358,9 @@ export class Room extends BaseRoom {
         try {
             const stateReqPre = this._hsApi.state(this._roomId, eventType, stateKey, content)
             const stateReq = await stateReqPre.response()
-            console.log('stateReq:', stateReq)
             const txn = await this._storage.readWriteTxn([
                 this._storage.storeNames.roomState,
             ]);
-            console.log(':",', { state_key: "", type: eventType, content: stateReq })
             await txn.roomState.set(this._roomId, { state_key: "", type: eventType, content: stateReq })
             return stateReq;
         } catch (e) { 
