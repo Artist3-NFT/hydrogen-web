@@ -14,10 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {directionalConcat, directionalAppend} from "./common.js";
-import {Direction} from "../Direction";
-import {EventEntry} from "../entries/EventEntry.js";
-import {FragmentBoundaryEntry} from "../entries/FragmentBoundaryEntry.js";
+import { directionalConcat, directionalAppend } from "./common.js";
+import { Direction } from "../Direction";
+import { EventEntry } from "../entries/EventEntry.js";
+import { FragmentBoundaryEntry } from "../entries/FragmentBoundaryEntry.js";
+import { EventKey } from "../EventKey";
+
 
 class ReaderRequest {
     constructor(fn, log) {
@@ -84,7 +86,7 @@ async function readRawTimelineEntriesWithTxn(roomId, eventKey, direction, amount
 }
 
 export class TimelineReader {
-    constructor({roomId, storage, fragmentIdComparer}) {
+    constructor({ roomId, storage, fragmentIdComparer }) {
         this._roomId = roomId;
         this._storage = storage;
         this._fragmentIdComparer = fragmentIdComparer;
@@ -110,6 +112,53 @@ export class TimelineReader {
         return new ReaderRequest(async (r, log) => {
             const txn = await this._storage.readTxn(this.readTxnStores);
             return await this._readFrom(eventKey, direction, amount, r, txn, log);
+        }, log);
+    }
+
+    findEventUntilEnd(eventId, log) {
+        return new ReaderRequest(async (r, log) => {
+            const txn = await this._storage.readTxn(this.readTxnStores);
+            const liveFragment = await txn.timelineFragments.liveFragment(this._roomId);
+            let entries = [];
+            let found = false
+            // room hasn't been synced yet
+            if (!liveFragment) {
+                entries = [];
+            } else {
+                let findTarget
+                const liveFragmentEntry = FragmentBoundaryEntry.end(liveFragment, this._fragmentIdComparer);
+                let eventKey = liveFragmentEntry.asEventKey();
+                let currentEntries;
+                let touchEnd = false;
+                let limitConter = 0
+
+                do {
+                    this._fragmentIdComparer.add(liveFragment);
+                    currentEntries = await this._readFrom(eventKey, Direction.Backward, 50, r, txn, log);
+                    if (eventId) {
+                        findTarget = currentEntries.find(e => e.id === eventId)
+                    }
+                    entries = Array.prototype.concat([...currentEntries], [...entries])
+                    console.log('currentEntries:', currentEntries)
+                    if (findTarget) {
+                        found = true
+                    } else if (currentEntries?.length > 0) {
+                        const currentTile = currentEntries[0]
+                        if (currentTile instanceof FragmentBoundaryEntry) {
+                            if (currentTile.edgeReached || currentTile.edgeReached) {
+                                touchEnd = true
+                            } else {
+                                console.log('Warning: load from local find FragmentBoundaryEntry but not edge!!!', currentTile)
+                                touchEnd = true
+                            }
+                        } else {
+                            eventKey = new EventKey(currentTile?.fragmentId || currentTile?._eventEntry?.fragmentId, currentTile?._eventEntry?.eventIndex)
+                        }
+                    }
+                } while (!found && currentEntries?.length > 0 && !touchEnd && limitConter < 200)
+                entries.unshift(liveFragmentEntry);
+            }
+            return { entries, found };
         }, log);
     }
 

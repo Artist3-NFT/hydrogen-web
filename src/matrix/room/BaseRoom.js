@@ -271,95 +271,115 @@ export class BaseRoom extends EventEmitter {
             return this._memberList;
         }
     }
-    /** @public */
-    /**
-     * return: find the target event or not?
-     */
-    fillGapUntilTarget(targetEventKey, log = null) {
-        console.log('ZZQ fillGapUntilTarget:', targetEventKey)
-        const tile = new GapTile(new FragmentBoundaryEntry(fragment, true), {roomVM: {room}});
-        // const fragmentEntry = tile.
-        // TODO move some/all of this out of BaseRoom
-        return this._platform.logger.wrapOrRun(log, "fillGapUntilTarget", async log => {
-            log.set("id", this.id);
-            log.set("fragment", fragmentEntry.fragmentId);
-            log.set("dir", fragmentEntry.direction.asApiString());
-            if (fragmentEntry.edgeReached) {
-                log.set("edgeReached", true);
-                return false;
-            }
-            const response = []
-            let targetLoaded = false
-
-            do {
-                const callRes = await this._hsApi.messages(this._roomId, {
-                    from: fragmentEntry.token,
-                    dir: fragmentEntry.direction.asApiString(),
-                    limit: 20,
-                    filter: {
-                        lazy_load_members: true,
-                        include_redundant_members: true,
-                    }
-                }, { log }).response();
-                callRes.chunk.forEach(element => {
-                    response.push(element)
-                    if (element.event_id === targetEventKey) {
-                        targetLoaded = true
-                    }
-                });
-            } while (!targetLoaded);
-
-
-            console.log('ZZQ fillGapUntilTarget response: got, ', response)
+    async loadEventsFromServer(eventId, times = 5, pageSize = 100, log = null) {
+        let showMembersEvent = false
+        const hydrogenContainer = document.getElementById('hydrogen-container')
+        if (hydrogenContainer?.classList.contains('welcome-channel')) {
+            showMembersEvent = true
+        }
+        let foundedInServer = false
+        let counter = 0
+        const filter = {
+            lazy_load_members: true,
+            include_redundant_members: true,
+            not_types: showMembersEvent ? [] : ['m.room.member']
+        }
+        return this._platform.logger.wrapOrRun(log, "loadEventsFromServer", async log => {
             const txn = await this._storage.readWriteTxn([
                 this._storage.storeNames.pendingEvents,
                 this._storage.storeNames.timelineEvents,
                 this._storage.storeNames.timelineRelations,
                 this._storage.storeNames.timelineFragments,
             ]);
-            let extraGapFillChanges;
-            let gapResult;
-            try {
-                // detect remote echos of pending messages in the gap
-                extraGapFillChanges = await this._writeGapFill(response.chunk, txn, log);
-                // write new events into gap
-                const relationWriter = new RelationWriter({
-                    roomId: this._roomId,
-                    fragmentIdComparer: this._fragmentIdComparer,
-                    ownUserId: this._user.id,
-                });
-                const gapWriter = new GapWriter({
-                    roomId: this._roomId,
-                    storage: this._storage,
-                    fragmentIdComparer: this._fragmentIdComparer,
-                    relationWriter
-                });
-                gapResult = await gapWriter.writeFragmentFill(fragmentEntry, response, txn, log);
-                console.log('ZZQ fillGap gapResult: got, ', gapResult)
-            } catch (err) {
-                txn.abort();
-                throw err;
+            const liveFragment = await txn.timelineFragments.liveFragment(this._roomId);
+            this._fragmentIdComparer.add(liveFragment);
+            const liveFragmentEntry = FragmentBoundaryEntry.start(liveFragment, this._fragmentIdComparer);
+            console.log('liveFragmentEntry:', liveFragmentEntry)
+            if (liveFragmentEntry.edgeReached) {
+                log.set("edgeReached", true);
+                return [];
             }
-            await txn.complete();
-            if (this._roomEncryption) {
-                const decryptRequest = this._decryptEntries(DecryptionSource.Timeline, gapResult.entries, null, log);
-                await decryptRequest.complete();
+            let queryToken = liveFragmentEntry.token
+            let queriedDataFromServer = []
+            let sumResponse = {}
+            let edgeReached = false
+            let founded = false
+            do {
+                const response = await this._hsApi.messages(this._roomId, {
+                    from: queryToken,
+                    dir: liveFragmentEntry.direction.asApiString(),
+                    limit: pageSize,
+                    filter
+                }, { log }).response();
+                if (response.chunk.length > 0) {
+                    queriedDataFromServer.push(response)
+                    queryToken = response.end
+                    if (eventId) {
+                        const targetEvent = response.chunk.find(evt => evt.event_id === eventId)
+                        if (!!targetEvent) {
+                            founded = true
+                        }
+                    }
+                } else {
+                    edgeReached = true
+                    counter = counter + times
+                }
+                counter++
+            } while (!foundedInServer && counter < times && !founded)
+            log.set("id", this.id);
+            if (queriedDataFromServer.length > 0) {
+                let extraGapFillChanges;
+                let gapResult;
+                try {
+                    const chunks = Array.prototype.concat(...queriedDataFromServer.map(q => [...q.chunk]))
+                    const states = Array.prototype.concat(...queriedDataFromServer.map(q => [...q.state]))
+                    sumResponse = {
+                        chunk: chunks,
+                        state: states,
+                        edgeReached,
+                        start: queriedDataFromServer[0].start,
+                        end: queriedDataFromServer[queriedDataFromServer.length - 1].end,
+                    }
+                    console.log('ZZQ sumResponse:', sumResponse)
+                    extraGapFillChanges = await this._writeGapFill(chunks, txn, log);
+                    // write new events into gap
+                    const relationWriter = new RelationWriter({
+                        roomId: this._roomId,
+                        fragmentIdComparer: this._fragmentIdComparer,
+                        ownUserId: this._user.id,
+                    });
+                    const gapWriter = new GapWriter({
+                        roomId: this._roomId,
+                        storage: this._storage,
+                        fragmentIdComparer: this._fragmentIdComparer,
+                        relationWriter
+                    });
+                    const txn3 = await this._storage.readWriteTxn([
+                        this._storage.storeNames.pendingEvents,
+                        this._storage.storeNames.timelineEvents,
+                        this._storage.storeNames.timelineRelations,
+                        this._storage.storeNames.timelineFragments,
+                    ]);
+                    gapResult = await gapWriter.writeFragmentFill(liveFragmentEntry, sumResponse, txn3, log);
+                    await txn3.complete()
+                    console.log('gapResult:', gapResult)
+                } catch (err) {
+                    console.log('catch (err!!!')
+                    txn.abort();
+                    throw err;
+                }
+                // await txn?.complete?.();
+                for (const fragment of gapResult.fragments) {
+                    this._fragmentIdComparer.add(fragment);
+                }
+                if (extraGapFillChanges) {
+                    this._applyGapFill(extraGapFillChanges);
+                }
+                return sumResponse;
             }
-            // once txn is committed, update in-memory state & emit events
-            for (const fragment of gapResult.fragments) {
-                this._fragmentIdComparer.add(fragment);
-            }
-            if (extraGapFillChanges) {
-                this._applyGapFill(extraGapFillChanges);
-            }
-            if (this._timeline) {
-                // these should not be added if not already there
-                this._timeline.replaceEntries(gapResult.updatedEntries);
-                this._timeline.addEntries(gapResult.entries);
-            }
+            return []
         })
     }
-
     /** @public */
     fillGap(fragmentEntry, amount, log = null) {
         let showMembersEvent = false
@@ -383,11 +403,10 @@ export class BaseRoom extends EventEmitter {
                 filter: {
                     lazy_load_members: true,
                     include_redundant_members: true,
-                    not_types: showMembersEvent?[]:['m.room.member']
+                    not_types: showMembersEvent ? [] : ['m.room.member']
                 }
             }, { log }).response();
 
-            // console.log('ZZQ fillGap response: got, ', response)
             const txn = await this._storage.readWriteTxn([
                 this._storage.storeNames.pendingEvents,
                 this._storage.storeNames.timelineEvents,
@@ -412,79 +431,6 @@ export class BaseRoom extends EventEmitter {
                     relationWriter
                 });
                 gapResult = await gapWriter.writeFragmentFill(fragmentEntry, response, txn, log);
-                console.log('ZZQ fillGap gapResult: got, ', gapResult)
-            } catch (err) {
-                txn.abort();
-                throw err;
-            }
-            await txn.complete();
-            if (this._roomEncryption) {
-                const decryptRequest = this._decryptEntries(DecryptionSource.Timeline, gapResult.entries, null, log);
-                await decryptRequest.complete();
-            }
-            // once txn is committed, update in-memory state & emit events
-            for (const fragment of gapResult.fragments) {
-                this._fragmentIdComparer.add(fragment);
-            }
-            if (extraGapFillChanges) {
-                this._applyGapFill(extraGapFillChanges);
-            }
-            if (this._timeline) {
-                // these should not be added if not already there
-                this._timeline.replaceEntries(gapResult.updatedEntries);
-                this._timeline.addEntries(gapResult.entries);
-            }
-        });
-    }
-
-    /** @public */
-    fillGap2(fragmentEntry, amount, log = null, targetEventKey = null) {
-        console.log('ZZQ fillGap2:', fragmentEntry, amount)
-        // TODO move some/all of this out of BaseRoom
-        return this._platform.logger.wrapOrRun(log, "fillGap", async log => {
-            log.set("id", this.id);
-            log.set("fragment", fragmentEntry.fragmentId);
-            log.set("dir", fragmentEntry.direction.asApiString());
-            if (fragmentEntry.edgeReached) {
-                log.set("edgeReached", true);
-                return;
-            }
-            const response = await this._hsApi.messages(this._roomId, {
-                from: fragmentEntry.token,
-                dir: fragmentEntry.direction.asApiString(),
-                limit: amount,
-                filter: {
-                    lazy_load_members: true,
-                    include_redundant_members: true,
-                }
-            }, { log }).response();
-
-            console.log('ZZQ fillGap2 response: got, ', response)
-            const txn = await this._storage.readWriteTxn([
-                this._storage.storeNames.pendingEvents,
-                this._storage.storeNames.timelineEvents,
-                this._storage.storeNames.timelineRelations,
-                this._storage.storeNames.timelineFragments,
-            ]);
-            let extraGapFillChanges;
-            let gapResult;
-            try {
-                // detect remote echos of pending messages in the gap
-                extraGapFillChanges = await this._writeGapFill(response.chunk, txn, log);
-                // write new events into gap
-                const relationWriter = new RelationWriter({
-                    roomId: this._roomId,
-                    fragmentIdComparer: this._fragmentIdComparer,
-                    ownUserId: this._user.id,
-                });
-                const gapWriter = new GapWriter({
-                    roomId: this._roomId,
-                    storage: this._storage,
-                    fragmentIdComparer: this._fragmentIdComparer,
-                    relationWriter
-                });
-                gapResult = await gapWriter.writeFragmentFill(fragmentEntry, response, txn, log);
-                console.log('ZZQ fillGap2 gapResult: got, ', gapResult)
             } catch (err) {
                 txn.abort();
                 throw err;

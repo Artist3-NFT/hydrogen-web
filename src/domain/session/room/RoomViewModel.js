@@ -265,7 +265,40 @@ export class RoomViewModel extends ViewModel {
         return { type: msgtype, message: message };
     }
 
+    async loadEventsFromServer(eventId) {
+        this._timelineVM._options.room.loadEventsFromServer(eventId)
+    }
+    async searchTextLocal(textContent) {
+        const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventByTextLocal(textContent)
+        console.log('ZZQ searchTextLocal loadAndFindUtilRes:', loadAndFindUtilRes)
+        return loadAndFindUtilRes
+    }
+    async searchTextServer(textContent) {
+        await this._timelineVM._options.room.loadEventsFromServer()
+        const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventByTextLocal(textContent)
+        console.log('ZZQ searchTextServer loadAndFindUtilRes:', loadAndFindUtilRes)
+        return loadAndFindUtilRes
+    }
+    async loadUtilEvent(eventId) {
+        // search 
+        const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventUtil(eventId)
+        if (loadAndFindUtilRes.found) {
+            console.log('loadUtilEvent:: found!!')
+            return true
+            // scroll to the event
+        } else {
+            console.log('loadUtilEvent:: NO NO NO NO!! Not found!!')
+            await this.loadEventsFromServer(eventId)
+            const loadAndFindUtilRes2 = await this._timelineVM._timeline.searchEventUtil(eventId)
+            console.log('loadAndFindUtilRes2::', loadAndFindUtilRes2)
+            return !!loadAndFindUtilRes2.found
+        }
+    }
     async _setPinnedMessage(eventId) {
+        // console.log('this._timelineVM:', this._timelineVM, this._timelineVM._options.tileOptions.roomVM)
+        // const resSearch = await this.loadUtilEvent("$xf2vDOy0xZJ-Ex_mAO5RVQtc0grUFh31zWqVX56qY5M")
+        // // const resSearch = await this.searchTextServer('22')
+        // console.log('resSearch;". ', resSearch)
         if (!this._room.isArchived && eventId) {
             try {
                 await this.updatePinnedMessage()

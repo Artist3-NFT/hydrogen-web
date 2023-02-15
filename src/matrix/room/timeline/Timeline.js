@@ -15,19 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {SortedArray, AsyncMappedList, ConcatList, ObservableArray} from "../../../observable/index.js";
-import {Disposables} from "../../../utils/Disposables";
-import {Direction} from "./Direction";
-import {TimelineReader} from "./persistence/TimelineReader.js";
-import {PendingEventEntry} from "./entries/PendingEventEntry.js";
-import {RoomMember} from "../members/RoomMember.js";
-import {getRelation, ANNOTATION_RELATION_TYPE} from "./relations.js";
-import {REDACTION_TYPE} from "../common";
-import {NonPersistedEventEntry} from "./entries/NonPersistedEventEntry.js";
-import {EVENT_TYPE as MEMBER_EVENT_TYPE} from "../members/RoomMember.js";
+import { SortedArray, AsyncMappedList, ConcatList, ObservableArray } from "../../../observable/index.js";
+import { Disposables } from "../../../utils/Disposables";
+import { Direction } from "./Direction";
+import { TimelineReader } from "./persistence/TimelineReader.js";
+import { PendingEventEntry } from "./entries/PendingEventEntry.js";
+import { RoomMember } from "../members/RoomMember.js";
+import { getRelation, ANNOTATION_RELATION_TYPE } from "./relations.js";
+import { REDACTION_TYPE } from "../common";
+import { NonPersistedEventEntry } from "./entries/NonPersistedEventEntry.js";
+import { EVENT_TYPE as MEMBER_EVENT_TYPE } from "../members/RoomMember.js";
 
 export class Timeline {
-    constructor({roomId, storage, closeCallback, fragmentIdComparer, pendingEvents, clock, powerLevelsObservable, hsApi}) {
+    constructor({ roomId, storage, closeCallback, fragmentIdComparer, pendingEvents, clock, powerLevelsObservable, hsApi }) {
         this._roomId = roomId;
         this._storage = storage;
         this._closeCallback = closeCallback;
@@ -45,7 +45,7 @@ export class Timeline {
         });
         this._readerRequest = null;
         this._allEntries = null;
-        /** Stores event entries that we had to fetch from hs/storage for reply previews (because they were not in timeline) */ 
+        /** Stores event entries that we had to fetch from hs/storage for reply previews (because they were not in timeline) */
         this._contextEntriesNotInTimeline = new Map();
         /** Only used to decrypt non-persisted context entries fetched from the homeserver */
         this._decryptEntries = null;
@@ -91,6 +91,50 @@ export class Timeline {
             this._disposables.disposeTracked(readerRequest);
         }
         // txn should be assumed to have finished here, as decryption will close it.
+    }
+
+    async searchEventUtil(eventId, log) {
+        const readerRequest = this._disposables.track(this._timelineReader.findEventUntilEnd(eventId, log));
+        try {
+            const entries = await readerRequest.complete();
+            if (entries.found) {
+                this._loadContextEntriesWhereNeeded(entries.entries);
+                this._setupEntries(entries.entries);
+            }
+            return entries
+        } catch (e) {
+            this._disposables.disposeTracked(readerRequest);
+            return {}
+        }
+    }
+    async searchEventByTextLocal(textContent, log) {
+        const readerRequest = this._disposables.track(this._timelineReader.findEventUntilEnd(undefined, log));
+        try {
+            const entries = await readerRequest.complete();
+            // if (entries.found) {
+            //     this._loadContextEntriesWhereNeeded(entries.entries);
+            //     this._setupEntries(entries.entries);
+            // }
+            console.log('entries.entries:', entries.entries, textContent)
+            const filteredEntries = (entries.entries || []).filter(e => {
+                const eventContent = e?._eventEntry?.event?.content
+                if (eventContent && eventContent.msgtype === 'm.text') {
+                    return (eventContent.body || '').toLowerCase().includes(textContent.toLowerCase())
+                }
+                return false
+            })
+            console.log('ZZQ filteredEntries:', filteredEntries)
+            return filteredEntries
+        } catch (e) {
+            this._disposables.disposeTracked(readerRequest);
+            return {}
+        }
+    }
+    loadEventEntries(entries) {
+        try {
+            this._loadContextEntriesWhereNeeded(entries);
+            this._setupEntries(entries);
+        } finally { }
     }
 
     _setupEntries(timelineEntries) {
@@ -478,18 +522,18 @@ export class Timeline {
     }
 }
 
-import {FragmentIdComparer} from "./FragmentIdComparer.js";
-import {poll} from "../../../mocks/poll.js";
-import {Clock as MockClock} from "../../../mocks/Clock.js";
-import {createMockStorage} from "../../../mocks/Storage";
-import {ListObserver} from "../../../mocks/ListObserver.js";
-import {createEvent, withTextBody, withContent, withSender, withRedacts, withReply} from "../../../mocks/event.js";
-import {NullLogItem} from "../../../logging/NullLogger";
-import {EventEntry} from "./entries/EventEntry.js";
-import {User} from "../../User.js";
-import {PendingEvent} from "../sending/PendingEvent.js";
-import {createAnnotation} from "./relations.js";
-import {redactEvent} from "./common.js";
+import { FragmentIdComparer } from "./FragmentIdComparer.js";
+import { poll } from "../../../mocks/poll.js";
+import { Clock as MockClock } from "../../../mocks/Clock.js";
+import { createMockStorage } from "../../../mocks/Storage";
+import { ListObserver } from "../../../mocks/ListObserver.js";
+import { createEvent, withTextBody, withContent, withSender, withRedacts, withReply } from "../../../mocks/event.js";
+import { NullLogItem } from "../../../logging/NullLogger";
+import { EventEntry } from "./entries/EventEntry.js";
+import { User } from "../../User.js";
+import { PendingEvent } from "../sending/PendingEvent.js";
+import { createAnnotation } from "./relations.js";
+import { redactEvent } from "./common.js";
 
 export function tests() {
     const fragmentIdComparer = new FragmentIdComparer([]);
@@ -527,26 +571,30 @@ export function tests() {
     return {
         "adding or replacing entries before subscribing to entries does not lose local relations": async assert => {
             const pendingEvents = new ObservableArray();
-            const timeline = new Timeline({roomId, storage: await createMockStorage(),
-                closeCallback: () => {}, fragmentIdComparer, pendingEvents, clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(),
+                closeCallback: () => { }, fragmentIdComparer, pendingEvents, clock: new MockClock()
+            });
             // 1. load timeline
             await timeline.load(new User(alice), "join", new NullLogItem());
             // 2. test replaceEntries and addEntries don't fail
             const event1 = withTextBody("hi!", withSender(bob, createEvent("m.room.message", "!abc")));
-            const entry1 = new EventEntry({event: event1, fragmentId: 1, eventIndex: 1}, fragmentIdComparer);
+            const entry1 = new EventEntry({ event: event1, fragmentId: 1, eventIndex: 1 }, fragmentIdComparer);
             timeline.replaceEntries([entry1]);
             const event2 = withTextBody("hi bob!", withSender(alice, createEvent("m.room.message", "!def")));
-            const entry2 = new EventEntry({event: event2, fragmentId: 1, eventIndex: 2}, fragmentIdComparer);
+            const entry2 = new EventEntry({ event: event2, fragmentId: 1, eventIndex: 2 }, fragmentIdComparer);
             timeline.addEntries([entry2]);
             // 3. add local relation (redaction)
-            pendingEvents.append(new PendingEvent({data: {
-                roomId,
-                queueIndex: 1,
-                eventType: "m.room.redaction",
-                txnId: "t123",
-                content: {},
-                relatedEventId: event2.event_id
-            }}));
+            pendingEvents.append(new PendingEvent({
+                data: {
+                    roomId,
+                    queueIndex: 1,
+                    eventType: "m.room.redaction",
+                    txnId: "t123",
+                    content: {},
+                    relatedEventId: event2.event_id
+                }
+            }));
             // 4. subscribe (it's now safe to iterate timeline.entries) 
             timeline.entries.subscribe(new ListObserver());
             // 5. check the local relation got correctly aggregated
@@ -556,34 +604,40 @@ export function tests() {
         "add and remove local reaction, and cancel again": async assert => {
             // 1. setup timeline with message
             const pendingEvents = new ObservableArray();
-            const timeline = new Timeline({roomId, storage: await createMockStorage(),
-                closeCallback: () => {}, fragmentIdComparer, pendingEvents, clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(),
+                closeCallback: () => { }, fragmentIdComparer, pendingEvents, clock: new MockClock()
+            });
             await timeline.load(new User(bob), "join", new NullLogItem());
             timeline.entries.subscribe(new ListObserver());
             const event = withTextBody("hi bob!", withSender(alice, createEvent("m.room.message", "!abc")));
-            timeline.addEntries([new EventEntry({event, fragmentId: 1, eventIndex: 2}, fragmentIdComparer)]);
+            timeline.addEntries([new EventEntry({ event, fragmentId: 1, eventIndex: 2 }, fragmentIdComparer)]);
             let entry = getIndexFromIterable(timeline.entries, 0);
             // 2. add local reaction
-            pendingEvents.append(new PendingEvent({data: {
-                roomId,
-                queueIndex: 1,
-                eventType: "m.reaction",
-                txnId: "t123",
-                content: entry.annotate("👋"),
-                relatedEventId: entry.id
-            }}));
+            pendingEvents.append(new PendingEvent({
+                data: {
+                    roomId,
+                    queueIndex: 1,
+                    eventType: "m.reaction",
+                    txnId: "t123",
+                    content: entry.annotate("👋"),
+                    relatedEventId: entry.id
+                }
+            }));
             await poll(() => timeline.entries.length === 2);
             assert.equal(entry.pendingAnnotations.get("👋").count, 1);
             const reactionEntry = getIndexFromIterable(timeline.entries, 1);
             // 3. add redaction to timeline
-            pendingEvents.append(new PendingEvent({data: {
-                roomId,
-                queueIndex: 2,
-                eventType: "m.room.redaction",
-                txnId: "t456",
-                content: {},
-                relatedTxnId: reactionEntry.id
-            }}));
+            pendingEvents.append(new PendingEvent({
+                data: {
+                    roomId,
+                    queueIndex: 2,
+                    eventType: "m.room.redaction",
+                    txnId: "t456",
+                    content: {},
+                    relatedTxnId: reactionEntry.id
+                }
+            }));
             // TODO: await nextUpdate here with ListObserver, to ensure entry emits an update when pendingAnnotations changes
             await poll(() => timeline.entries.length === 3);
             assert.equal(entry.pendingAnnotations.get("👋").count, 0);
@@ -609,8 +663,10 @@ export function tests() {
             txn.timelineRelations.add(roomId, messageId, ANNOTATION_RELATION_TYPE, reactionId);
             await txn.complete();
             // 2. setup the timeline
-            const timeline = new Timeline({roomId, storage, closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage, closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()
+            });
             await timeline.load(new User(bob), "join", new NullLogItem());
             // 3. get the own annotation out
             const reactionEntry = await timeline.getOwnAnnotationEntry(messageId, "👋");
@@ -622,13 +678,15 @@ export function tests() {
                 event: withTextBody("hi bob!", createEvent("m.room.message", "!abc", alice)),
                 fragmentId: 1, eventIndex: 2, roomId,
                 annotations: { // aggregated like RelationWriter would
-                    "👋": {count: 1, me: true, firstTimestamp: 0}
+                    "👋": { count: 1, me: true, firstTimestamp: 0 }
                 },
             }, fragmentIdComparer);
             // 2. setup timeline
             const pendingEvents = new ObservableArray();
-            const timeline = new Timeline({roomId, storage: await createMockStorage(),
-                closeCallback: () => {}, fragmentIdComparer, pendingEvents, clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(),
+                closeCallback: () => { }, fragmentIdComparer, pendingEvents, clock: new MockClock()
+            });
             await timeline.load(new User(bob), "join", new NullLogItem());
             timeline.entries.subscribe(new ListObserver());
             // 3. add message to timeline
@@ -640,8 +698,10 @@ export function tests() {
         "remove remote reaction": async assert => {
             // 1. setup timeline
             const pendingEvents = new ObservableArray();
-            const timeline = new Timeline({roomId, storage: await createMockStorage(),
-                closeCallback: () => { }, fragmentIdComparer, pendingEvents, clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(),
+                closeCallback: () => { }, fragmentIdComparer, pendingEvents, clock: new MockClock()
+            });
             await timeline.load(new User(bob), "join", new NullLogItem());
             timeline.entries.subscribe(new ListObserver());
             // 2. add message and reaction to timeline
@@ -655,35 +715,43 @@ export function tests() {
             }, fragmentIdComparer);
             timeline.addEntries([messageEntry, reactionEntry]);
             // 3. redact reaction
-            pendingEvents.append(new PendingEvent({data: {
-                roomId,
-                queueIndex: 1,
-                eventType: "m.room.redaction",
-                txnId: "t123",
-                content: {},
-                relatedEventId: reactionEntry.id
-            }}));
+            pendingEvents.append(new PendingEvent({
+                data: {
+                    roomId,
+                    queueIndex: 1,
+                    eventType: "m.room.redaction",
+                    txnId: "t123",
+                    content: {},
+                    relatedEventId: reactionEntry.id
+                }
+            }));
             await poll(() => timeline.entries.length >= 3);
             assert.equal(messageEntry.pendingAnnotations.get("👋").count, -1);
         },
         "local reaction gets applied after remote echo is added to timeline": async assert => {
-            const messageEntry = new EventEntry({event: withTextBody("hi bob!", withSender(alice, createEvent("m.room.message", "!abc"))),
-                fragmentId: 1, eventIndex: 2}, fragmentIdComparer);
+            const messageEntry = new EventEntry({
+                event: withTextBody("hi bob!", withSender(alice, createEvent("m.room.message", "!abc"))),
+                fragmentId: 1, eventIndex: 2
+            }, fragmentIdComparer);
             // 1. setup timeline
             const pendingEvents = new ObservableArray();
-            const timeline = new Timeline({roomId, storage: await createMockStorage(),
-                closeCallback: () => {}, fragmentIdComparer, pendingEvents, clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(),
+                closeCallback: () => { }, fragmentIdComparer, pendingEvents, clock: new MockClock()
+            });
             await timeline.load(new User(bob), "join", new NullLogItem());
             timeline.entries.subscribe(new ListObserver());
             // 2. add local reaction
-            pendingEvents.append(new PendingEvent({data: {
-                roomId,
-                queueIndex: 1,
-                eventType: "m.reaction",
-                txnId: "t123",
-                content: messageEntry.annotate("👋"),
-                relatedEventId: messageEntry.id
-            }}));
+            pendingEvents.append(new PendingEvent({
+                data: {
+                    roomId,
+                    queueIndex: 1,
+                    eventType: "m.reaction",
+                    txnId: "t123",
+                    content: messageEntry.annotate("👋"),
+                    relatedEventId: messageEntry.id
+                }
+            }));
             await poll(() => timeline.entries.length === 1);
             // 3. add remote reaction target
             timeline.addEntries([messageEntry]);
@@ -705,24 +773,29 @@ export function tests() {
             await txn.complete();
             // 2. setup timeline
             const pendingEvents = new ObservableArray();
-            const timeline = new Timeline({roomId, storage, closeCallback: () => {},
-                fragmentIdComparer, pendingEvents, clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage, closeCallback: () => { },
+                fragmentIdComparer, pendingEvents, clock: new MockClock()
+            });
             await timeline.load(new User(bob), "join", new NullLogItem());
             timeline.entries.subscribe(new ListObserver());
             // 3. add local redaction for reaction
-            pendingEvents.append(new PendingEvent({data: {
-                roomId,
-                queueIndex: 1,
-                eventType: "m.room.redaction",
-                txnId: "t123",
-                content: {},
-                relatedEventId: reactionId
-            }}));
+            pendingEvents.append(new PendingEvent({
+                data: {
+                    roomId,
+                    queueIndex: 1,
+                    eventType: "m.room.redaction",
+                    txnId: "t123",
+                    content: {},
+                    relatedEventId: reactionId
+                }
+            }));
             await poll(() => timeline.entries.length === 1);
             // 4. add reaction target
             timeline.addEntries([new EventEntry({
                 event: withTextBody("hi bob!", createEvent("m.room.message", messageId, alice)),
-                fragmentId: 1, eventIndex: 2}, fragmentIdComparer)
+                fragmentId: 1, eventIndex: 2
+            }, fragmentIdComparer)
             ]);
             await poll(() => timeline.entries.length === 2);
             // 5. check that redaction was linked to reaction target
@@ -732,16 +805,18 @@ export function tests() {
         "decrypted entry preserves content when receiving other update without decryption": async assert => {
             // 1. create encrypted and decrypted entry
             const encryptedEntry = new EventEntry({
-                event: withContent({ciphertext: "abc"}, createEvent("m.room.encrypted", "!abc", alice)),
-                    fragmentId: 1, eventIndex: 1, roomId
+                event: withContent({ ciphertext: "abc" }, createEvent("m.room.encrypted", "!abc", alice)),
+                fragmentId: 1, eventIndex: 1, roomId
             }, fragmentIdComparer);
             const decryptedEntry = encryptedEntry.clone();
             decryptedEntry.setDecryptionResult({
                 event: withTextBody("hi bob!", createEvent("m.room.message", encryptedEntry.id, encryptedEntry.sender))
             });
             // 2. setup the timeline
-            const timeline = new Timeline({roomId, storage: await createMockStorage(), closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(), closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()
+            });
             await timeline.load(new User(alice), "join", new NullLogItem());
             timeline.addEntries([decryptedEntry]);
             const observer = new ListObserver();
@@ -751,20 +826,22 @@ export function tests() {
             //    as it does not rerun the decryption)
             //    and check that the decrypted content is preserved
             timeline.replaceEntries([encryptedEntry]);
-            const {value, type} = await observer.next();
+            const { value, type } = await observer.next();
             assert.equal(type, "update");
             assert.equal(value.eventType, "m.room.message");
             assert.equal(value.content.body, "hi bob!");
         },
 
         "context entry is fetched from remoteEntries": async assert => {
-            const timeline = new Timeline({roomId, storage: await createMockStorage(), closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(), closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()
+            });
             const entryA = new EventEntry({ event: withTextBody("foo", createEvent("m.room.message", "event_id_1", alice)) });
             const entryB = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_2", bob)), eventIndex: 2 });
             await timeline.load(new User(alice), "join", new NullLogItem());
             timeline.entries.subscribe({
-                onAdd() {},
+                onAdd() { },
             });
             timeline.addEntries([entryA, entryB]);
             assert.deepEqual(entryB.contextEntry, entryA);
@@ -775,8 +852,10 @@ export function tests() {
             const txn = await storage.readWriteTxn([storage.storeNames.timelineEvents, storage.storeNames.timelineRelations]);
             txn.timelineEvents.tryInsert({ event: withTextBody("foo", createEvent("m.room.message", "event_id_1", alice)), fragmentId: 1, eventIndex: 1, roomId });
             await txn.complete();
-            const timeline = new Timeline({roomId, storage, closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage, closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()
+            });
             const entryB = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_2", bob)), eventIndex: 2 });
             await timeline.load(new User(alice), "join", new NullLogItem());
             timeline.entries.subscribe({ onAdd: () => null, onUpdate: () => null });
@@ -786,8 +865,10 @@ export function tests() {
         },
 
         "context entry is fetched from hs": async assert => {
-            const timeline = new Timeline({roomId, storage: await createMockStorage(), closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock(), hsApi});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(), closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock(), hsApi
+            });
             const entryB = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_2", bob)), eventIndex: 2 });
             await timeline.load(new User(alice), "join", new NullLogItem());
             timeline.entries.subscribe({ onAdd: () => null, onUpdate: () => null });
@@ -797,8 +878,10 @@ export function tests() {
         },
 
         "context entry has a list of entries to which it forms the context": async assert => {
-            const timeline = new Timeline({roomId, storage: await createMockStorage(), closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(), closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock()
+            });
             const entryA = new EventEntry({ event: withTextBody("foo", createEvent("m.room.message", "event_id_1", alice)), eventIndex: 1 });
             const entryB = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_2", bob)), eventIndex: 2 });
             const entryC = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_3", bob)), eventIndex: 3 });
@@ -810,8 +893,10 @@ export function tests() {
         },
 
         "context entry in contextEntryNotInTimeline gets updated based on incoming redaction": async assert => {
-            const timeline = new Timeline({roomId, storage: await createMockStorage(), closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock(), hsApi});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(), closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock(), hsApi
+            });
             const entryB = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_2", bob)), eventIndex: 2 });
             await timeline.load(new User(alice), "join", new NullLogItem());
             timeline.entries.subscribe({ onAdd: () => null, onUpdate: () => null });
@@ -823,8 +908,10 @@ export function tests() {
         },
 
         "redaction of context entry triggers updates in other entries": async assert => {
-            const timeline = new Timeline({roomId, storage: await createMockStorage(), closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock(), hsApi});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(), closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock(), hsApi
+            });
             const entryA = new EventEntry({ event: withTextBody("foo", createEvent("m.room.message", "event_id_1", alice)), eventIndex: 1, fragmentId: 1 });
             const entryB = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_2", bob)), eventIndex: 2, fragmentId: 1 });
             const entryC = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_3", bob)), eventIndex: 3, fragmentId: 1 });
@@ -846,8 +933,10 @@ export function tests() {
         },
 
         "context entries fetched from storage/hs are moved to remoteEntries": async assert => {
-            const timeline = new Timeline({roomId, storage: await createMockStorage(), closeCallback: () => {},
-                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock(), hsApi});
+            const timeline = new Timeline({
+                roomId, storage: await createMockStorage(), closeCallback: () => { },
+                fragmentIdComparer, pendingEvents: new ObservableArray(), clock: new MockClock(), hsApi
+            });
             const entryA = new EventEntry({ event: withTextBody("foo", createEvent("m.room.message", "event_id_1", alice)), eventIndex: 1 });
             const entryB = new EventEntry({ event: withReply("event_id_1", createEvent("m.room.message", "event_id_2", bob)), eventIndex: 2 });
             await timeline.load(new User(alice), "join", new NullLogItem());

@@ -179,6 +179,7 @@ export class GapWriter {
         }
 
         // begin (or end) of timeline reached
+        // if (chunk.length === 0 || response?.edgeReached) {
         if (chunk.length === 0) {
             fragmentEntry.edgeReached = true;
             await txn.timelineFragments.update(fragmentEntry.fragment);

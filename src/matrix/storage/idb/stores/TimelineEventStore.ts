@@ -111,6 +111,7 @@ class Range {
                 );
             }
         } catch(err) {
+            throw err;
             throw new StorageError(`IDBKeyRange failed with data: ` + JSON.stringify(this), err);
         }
     }
