@@ -160,6 +160,10 @@ export class HomeServerApi {
         return this._get(`/rooms/${encodeURIComponent(roomId)}/state/${encodeURIComponent(eventType)}/${encodeURIComponent(stateKey)}`, {}, undefined, options);
     }
 
+    event(roomId: string, eventId: string): IHomeServerRequest {
+        return this._get(`/rooms/${encodeURIComponent(roomId)}/event/${encodeURIComponent(eventId)}`, {}, undefined);
+    }
+
     setState(roomId: string, eventType: string, stateKey: string, content: Record<string, any>, options?: BaseRequestOptions): IHomeServerRequest {
         return this._put(`/rooms/${encodeURIComponent(roomId)}/state/${encodeURIComponent(eventType)}/${encodeURIComponent(stateKey)}`, {}, content, options);
     }

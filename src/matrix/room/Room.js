@@ -341,6 +341,30 @@ export class Room extends BaseRoom {
     _applyGapFill(removedPendingEvents) {
         this._sendQueue.emitRemovals(removedPendingEvents);
     }
+    async checkAndLoadEvents(eventIds) {
+        const txn = await this._storage.readWriteTxn([
+            this._storage.storeNames.timelineEvents,
+        ]);
+        const events = await txn.timelineEvents.getEventKeysForIds(this._roomId, eventIds)
+        txn.complete()
+        const res = []
+        for (let index = 0; index < eventIds.length; index++) {
+            const id = eventIds[index];
+            if (events.has(id)) {
+                const txn2 = await this._storage.readWriteTxn([
+                    this._storage.storeNames.timelineEvents,
+                ]);
+                const storageEntry = await txn2.timelineEvents.getByEventId(this._roomId, id)
+                txn2.complete()
+                res.push(storageEntry)
+            } else {
+                const loadEventReq = this._hsApi.event(this._roomId, id)
+                const loadEventRes = await loadEventReq.response()
+                res.push({ event: loadEventRes })
+            }
+        }
+        return res
+    }
 
     /** @public */
     sendEvent(eventType, content, attachments, log = null) {
@@ -363,7 +387,7 @@ export class Room extends BaseRoom {
             ]);
             await txn.roomState.set(this._roomId, { state_key: "", type: eventType, content: stateReq })
             return stateReq;
-        } catch (e) { 
+        } catch (e) {
             return null
         }
     }

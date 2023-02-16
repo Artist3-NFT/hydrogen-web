@@ -48,8 +48,14 @@ export class RoomMemberTile extends SimpleTile {
     }
     get shouldHide() {
         if (this.noContent) return true
-        const { content } = this._entry;
+        const { content, prevContent } = this._entry;
         const membership = content && content.membership;
+        const prevMembership = prevContent && prevContent.membership;
+        if (prevMembership === "join" && membership === "join") {
+            if (content.avatar_url !== prevContent.avatar_url) {
+                return true;
+            }
+        }
         if (membership === "join" || membership === "leave") {
             return false;
         }

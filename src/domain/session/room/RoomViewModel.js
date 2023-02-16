@@ -324,6 +324,11 @@ export class RoomViewModel extends ViewModel {
             }
         }
     }
+    async getEventsDataByIds(idList) {
+        if (idList.length > 0) {
+            return await this._room.checkAndLoadEvents(idList)
+        }
+    }
     async updatePinnedMessage() {
         if (!this._room.isArchived) {
             const res = await this._room.getState(PINNED_MESSAGE_TYPE, '');
