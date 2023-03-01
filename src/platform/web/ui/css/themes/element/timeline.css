@@ -130,6 +130,29 @@ limitations under the License.
     flex-direction: row;
     flex-wrap: wrap;
 }
+
+.Timeline_message .timeReactContainer .newTimeInMsgContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.Timeline_message .timeReactContainer .newTimeInMsgContainer .readAnchor {
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.Timeline_message .timeReactContainer .newTimeInMsgContainer .readAnchor:not(.read-already) {
+    background-image: url('icons/checkmark.svg');
+    ;
+}
+
+.Timeline_message .timeReactContainer .newTimeInMsgContainer .readAnchor.read-already {
+    background-image: url('icons/all-done.svg');
+    ;
+}
+
 .Timeline_message.messageDeleted .timeReactContainer {
     display: none;
 }
@@ -249,6 +272,7 @@ limitations under the License.
     margin-top: 0px;
     margin-bottom: 4px;
 }
+
 .Timeline_message .Timeline_messageBody {
     margin-top: 4px;
 }
@@ -360,6 +384,7 @@ limitations under the License.
     /* Fix for pre overflow */
     min-width: 0;
 }
+
 .Timeline_messageBody.deleted_message {
     font-style: italic;
     background-image: url('icons/slash.svg');

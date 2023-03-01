@@ -139,7 +139,53 @@ export class TimelineReader {
                         findTarget = currentEntries.find(e => e.id === eventId)
                     }
                     entries = Array.prototype.concat([...currentEntries], [...entries])
-                    console.log('currentEntries:', currentEntries)
+                    // console.log('currentEntries:', currentEntries)
+                    if (findTarget) {
+                        found = true
+                    } else if (currentEntries?.length > 0) {
+                        const currentTile = currentEntries[0]
+                        if (currentTile instanceof FragmentBoundaryEntry) {
+                            if (currentTile.edgeReached || currentTile.edgeReached) {
+                                touchEnd = true
+                            } else {
+                                console.log('Warning: load from local find FragmentBoundaryEntry but not edge!!!', currentTile)
+                                touchEnd = true
+                            }
+                        } else {
+                            eventKey = new EventKey(currentTile?.fragmentId || currentTile?._eventEntry?.fragmentId, currentTile?._eventEntry?.eventIndex)
+                        }
+                    }
+                } while (!found && currentEntries?.length > 0 && !touchEnd && limitConter < 200)
+                entries.unshift(liveFragmentEntry);
+            }
+            return { entries, found };
+        }, log);
+    }
+    findEventUntilEnd2(eventId, log) {
+        return new ReaderRequest(async (r, log) => {
+            const txn = await this._storage.readTxn(this.readTxnStores);
+            const liveFragment = await txn.timelineFragments.liveFragment(this._roomId);
+            let entries = [];
+            let found = false
+            // room hasn't been synced yet
+            if (!liveFragment) {
+                entries = [];
+            } else {
+                let findTarget
+                const liveFragmentEntry = FragmentBoundaryEntry.end(liveFragment, this._fragmentIdComparer);
+                let eventKey = liveFragmentEntry.asEventKey();
+                let currentEntries;
+                let touchEnd = false;
+                let limitConter = 0
+
+                do {
+                    this._fragmentIdComparer.add(liveFragment);
+                    currentEntries = await this._readFrom(eventKey, Direction.Backward, 50, r, txn, log);
+                    if (eventId) {
+                        findTarget = currentEntries.find(e => e.id === eventId)
+                    }
+                    entries = Array.prototype.concat([...currentEntries], [...entries])
+                    // console.log('currentEntries:', currentEntries)
                     if (findTarget) {
                         found = true
                     } else if (currentEntries?.length > 0) {

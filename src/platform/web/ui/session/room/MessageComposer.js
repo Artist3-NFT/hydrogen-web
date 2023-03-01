@@ -216,7 +216,7 @@ export class MessageComposer extends TemplateView {
             const vm = this.value;
             this._attachmentPopup = new Popup(new Menu([
                 Menu.option(vm.i18n`Video`, (e) => vm.sendVideo(e)).setIcon("video"),
-                Menu.option(vm.i18n`Photo`, (e) => vm.sendPicture(e)).setIcon("picture").setButtonClassName('sending-attach-picture'),
+                Menu.option(vm.i18n`Photo or Video`, (e) => vm.sendPicture(e)).setIcon("picture").setButtonClassName('sending-attach-picture'),
                 Menu.option(vm.i18n`Document`, (e) => vm.sendFile(e)).setIcon("file").setButtonClassName('sending-attach-file'),
                 Menu.option(vm.i18n`Token`, () => { }).setIcon("token"),
             ], 'bottom-menu'));

@@ -24,6 +24,7 @@ export function findAndUpdateInArray<T>(predicate: (value: T) => boolean, array:
         // allow bailing out of sending an emit if updater determined its not needed
         const params = updater(value);
         if (params !== false) {
+            console.log('ZZQ do emit !!!', index, value, params)
             observable.emitUpdate(index, value, params);
         }
         // found

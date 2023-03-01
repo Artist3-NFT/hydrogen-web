@@ -30,7 +30,7 @@ export function renderStaticAvatar(vm, size, extraClasses = undefined) {
     if (extraClasses) {
         avatarClasses += ` ${extraClasses}`;
     }
-    const avatarContent = hasAvatar ? renderImg(vm, size) : text(vm.avatarLetter);
+    const avatarContent = hasAvatar ? renderImg(vm, size) : renderDefaultImg(vm.avatarLetter, size);
     const avatar = tag.div({className: avatarClasses, "data-testid": "avatar"}, [avatarContent]);
     if (hasAvatar) {
         setAttribute(avatar, "data-avatar-letter", vm.avatarLetter);
@@ -45,8 +45,8 @@ export function renderImg(vm, size) {
 }
 export function renderDefaultImg(vm, size) {
     const sizeStr = size.toString();
-    const defaultUrl = '';
-    return tag.img({src: vm.avatarUrl(size), width: sizeStr, height: sizeStr, title: vm.avatarTitle});
+    const defaultUrl = 'https://storage.googleapis.com/gamic-prod/user/avator/portrait.svg';
+    return tag.img({src: defaultUrl, width: sizeStr, height: sizeStr, title: vm.avatarTitle});
 }
 
 function isAvatarEvent(e) {

@@ -266,31 +266,35 @@ export class RoomViewModel extends ViewModel {
     }
 
     async loadEventsFromServer(eventId) {
-        this._timelineVM._options.room.loadEventsFromServer(eventId)
+        const r = await this._timelineVM._options.room.loadEventsFromServer(eventId)
+        return r;
     }
     async searchTextLocal(textContent) {
         const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventByTextLocal(textContent)
-        console.log('ZZQ searchTextLocal loadAndFindUtilRes:', loadAndFindUtilRes)
+        // console.log('ZZQ searchTextLocal loadAndFindUtilRes:', loadAndFindUtilRes)
         return loadAndFindUtilRes
     }
     async searchTextServer(textContent) {
         await this._timelineVM._options.room.loadEventsFromServer()
         const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventByTextLocal(textContent)
-        console.log('ZZQ searchTextServer loadAndFindUtilRes:', loadAndFindUtilRes)
+        // console.log('ZZQ searchTextServer loadAndFindUtilRes:', loadAndFindUtilRes)
         return loadAndFindUtilRes
+    }
+    async loadAroundEventById(eventId) {
+        await this._timelineVM._timeline.searchAroundEvents(eventId)
     }
     async loadUtilEvent(eventId) {
         // search 
         const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventUtil(eventId)
         if (loadAndFindUtilRes.found) {
-            console.log('loadUtilEvent:: found!!')
+            // console.log('loadUtilEvent:: found!!')
             return true
             // scroll to the event
         } else {
-            console.log('loadUtilEvent:: NO NO NO NO!! Not found!!')
+            // console.log('loadUtilEvent:: NO NO NO NO!! Not found!!')
             await this.loadEventsFromServer(eventId)
             const loadAndFindUtilRes2 = await this._timelineVM._timeline.searchEventUtil(eventId)
-            console.log('loadAndFindUtilRes2::', loadAndFindUtilRes2)
+            // console.log('loadAndFindUtilRes2::', loadAndFindUtilRes2)
             return !!loadAndFindUtilRes2.found
         }
     }
@@ -389,7 +393,7 @@ export class RoomViewModel extends ViewModel {
         });
     }
 
-    async _pickAndSendVideo() {
+    async _pickAndSendVideo(event) {
         try {
             if (!this.platform.hasReadPixelPermission()) {
                 alert("Please allow canvas image data access, so we can scale your images down.");
@@ -429,7 +433,6 @@ export class RoomViewModel extends ViewModel {
             attachments["info.thumbnail_url"] =
                 this._room.createAttachment(thumbnail.blob, file.name);
             await this._room.sendEvent("m.room.message", content, attachments);
-            event.attachSent = true
         } catch (err) {
             this._sendError = err;
             this.emitChange("error");
@@ -443,39 +446,77 @@ export class RoomViewModel extends ViewModel {
                 alert("Please allow canvas image data access, so we can scale your images down.");
                 return;
             }
-            const file = await this.platform.openFile("image/*");
+            const file = await this.platform.openFile("image/*, video/*");
             if (!file) {
                 return;
             }
-            if (!file.blob.mimeType.startsWith("image/")) {
+            if (!file.blob.mimeType.startsWith("image/") && !file.blob.mimeType.startsWith("video/")) {
                 return this._sendFile(file);
             }
-            let image = await this.platform.loadImage(file.blob);
-            // const limit = await this.platform.settingsStorage.getInt("sentImageSizeLimit") || 1600;
-            const limit = 1 * 1024 * 1024
-            if (image.maxFileSizeLimitaion > limit) {
-                const compressRatio = limit / image.maxFileSizeLimitaion
-                const compressRatioReal = Number(Math.sqrt(compressRatio).toFixed(2))
-                const scaledImage = await image.scale2(compressRatioReal);
-                image.dispose();
-                image = scaledImage;
+            if (file.blob.mimeType.startsWith("image/")) {
+                let image = await this.platform.loadImage(file.blob);
+                // const limit = await this.platform.settingsStorage.getInt("sentImageSizeLimit") || 1600;
+                const limit = 1 * 1024 * 1024
+                if (image.maxFileSizeLimitaion > limit) {
+                    const compressRatio = limit / image.maxFileSizeLimitaion
+                    const compressRatioReal = Number(Math.sqrt(compressRatio).toFixed(2))
+                    const scaledImage = await image.scale2(compressRatioReal);
+                    image.dispose();
+                    image = scaledImage;
+                }
+                const content = {
+                    body: file.name,
+                    msgtype: "m.image",
+                    info: imageToInfo(image)
+                };
+                const attachments = {
+                    "url": this._room.createAttachment(image.blob, file.name),
+                };
+                if (image.maxDimension > 600) {
+                    const thumbnail = await image.scale(400);
+                    content.info.thumbnail_info = imageToInfo(thumbnail);
+                    attachments["info.thumbnail_url"] =
+                        this._room.createAttachment(thumbnail.blob, file.name);
+                }
+                await this._room.sendEvent("m.room.message", content, attachments);
+                event.attachSent = true
+            } else if (file.blob.mimeType.startsWith("video/")) {
+                let video;
+                if ((file.blob.mimeType || '').toLowerCase() === 'video/avi') {
+                    event?.videoTypeUnsupport?.()
+                    return
+                }
+                try {
+                    video = await this.platform.loadVideo(file.blob);
+                } catch (err) {
+                    // TODO: extract platform dependent code from view model
+                    if (err instanceof window.MediaError && err.code === 4) {
+                        throw new Error(`this browser does not support videos of type ${file?.blob.mimeType}.`);
+                    } else {
+                        throw err;
+                    }
+                }
+                const videoMaxSize = 50 * 1024 * 1024;
+                if (video.maxFileSizeLimitaion > videoMaxSize) {
+                    event.videoOversized = true
+                    event?.videoOversizedAlert?.()
+                } else {
+                    const content = {
+                        body: file.name,
+                        msgtype: "m.video",
+                        info: videoToInfo(video)
+                    };
+                    const attachments = {
+                        "url": this._room.createAttachment(video.blob, file.name),
+                    };
+                    const maxDimension = 800;
+                    const thumbnail = await video.scale(maxDimension);
+                    content.info.thumbnail_info = imageToInfo(thumbnail);
+                    attachments["info.thumbnail_url"] =
+                        this._room.createAttachment(thumbnail.blob, file.name);
+                    await this._room.sendEvent("m.room.message", content, attachments);
+                }
             }
-            const content = {
-                body: file.name,
-                msgtype: "m.image",
-                info: imageToInfo(image)
-            };
-            const attachments = {
-                "url": this._room.createAttachment(image.blob, file.name),
-            };
-            if (image.maxDimension > 600) {
-                const thumbnail = await image.scale(400);
-                content.info.thumbnail_info = imageToInfo(thumbnail);
-                attachments["info.thumbnail_url"] =
-                    this._room.createAttachment(thumbnail.blob, file.name);
-            }
-            await this._room.sendEvent("m.room.message", content, attachments);
-            event.attachSent = true
         } catch (err) {
             this._sendError = err;
             this.emitChange("error");

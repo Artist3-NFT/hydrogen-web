@@ -191,7 +191,7 @@ export class Sync {
             const filterContent = {
                 room: {
                     // account_data: { not_types: ['*'] },
-                    ephemeral: { not_types: ['*'] },
+                    ephemeral: { types: ["m.receipt", "m.typing"] },
                     state: { lazy_load_members: true },
                     timeline: { types: ['m.room.message', 'm.room.member', 'm.reaction'], limit: 1, lazy_load_members: true }
                     // timeline: { limit: 5, lazy_load_members: true }
@@ -208,9 +208,10 @@ export class Sync {
         const isInitialSync = !syncToken;
         const sessionState = new SessionSyncProcessState();
         const inviteStates = this._parseInvites(response.rooms);
+        console.log('AA response.rooms', response.rooms);
         const { roomStates, archivedRoomStates } = await this._parseRoomsResponse(
             response.rooms, inviteStates, isInitialSync, log);
-
+        console.log('BB roomStates:', roomStates);
         try {
             // take a lock on olm sessions used in this sync so sending a message doesn't change them while syncing
             sessionState.lock = await log.wrap("obtainSyncLock", () => this._session.obtainSyncLock(response));

@@ -48,6 +48,7 @@ export class BaseMessageView extends TemplateView {
         const li = t.el(this._tagName, {
             className: {
                 "Timeline_message": true,
+                "replied": this._isReplyPreview,
                 own: vm.isOwn,
                 newDay: !vm.isSameDay,
                 unsent: vm.isUnsent,
@@ -86,6 +87,8 @@ export class BaseMessageView extends TemplateView {
             },
             'data-event-id': vm.eventId
         }, children);
+        const emptyContent = t.div({ className: 'empty-content' });
+        li.appendChild(emptyContent)
         // given that there can be many tiles, we don't add
         // unneeded DOM nodes in case of a continuation, and we add it
         // with a side-effect binding to not have to create sub views,
@@ -102,12 +105,22 @@ export class BaseMessageView extends TemplateView {
                 li.insertBefore(sender, li.firstChild);
             }
         });
+
         const timeContainer = t.time({ className: { timeReactContainer: true } });
 
         // similarly, we could do this with a simple ifView,
         // but that adds a comment node to all messages without reactions
         let reactionsView = null;
-        const time = t.time({ className: { hidden: !vm.time } }, vm.time);
+        const timeInner = t.time({ className: { hidden: !vm.time } }, vm.time);
+        const readDataAnchor = t.div({ className: { readAnchor: true, 'read-already': vm.isReadAlreay } });
+        const time = t.div({ className: { hidden: !vm.time, 'newTimeInMsgContainer': true } }, [timeInner, readDataAnchor]);
+        t.mapSideEffect(vm => vm.isReadAlreay, isRead => {
+            if (isRead) {
+                if (!readDataAnchor.classList.contains('read-already')) {
+                    readDataAnchor.classList.add('read-already')
+                }
+            }
+        })
         t.mapSideEffect(vm => vm.reactions, reactions => {
             if (reactions && this._interactive && !reactionsView) {
                 reactionsView = new ReactionsView(reactions);
@@ -186,6 +199,7 @@ export class BaseMessageView extends TemplateView {
     async _toggleMenuMore(button, vm) {
         const options = [];
         if (vm instanceof TextTile) {
+            await vm._roomVM.updatePinnedMessage()
             const exists = await vm._room.loadStateFromIDB(PINNED_MESSAGE_TYPE)
             const roomPinnedMessages = exists?.event?.content?.pinned || []
             const currentEventId = vm?.eventId || ''
@@ -294,10 +308,12 @@ class QuickReactionsMenuOption {
     }
     toDOM(t) {
         const emojiButtons = ["👍", "👎", "😄", "🎉", "😕", "❤️", "🚀", "👀"].map(emoji => {
-            return t.button({ onClick: (e) => {
-                e.reactingSender = this._vm.sender
-                this._vm.react(emoji)
-            } }, emoji);
+            return t.button({
+                onClick: (e) => {
+                    e.reactingSender = this._vm.sender
+                    this._vm.react(emoji)
+                }
+            }, emoji);
         });
         const customButton = t.button({
             className: 'emoji-more',

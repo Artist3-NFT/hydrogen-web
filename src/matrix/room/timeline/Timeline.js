@@ -115,25 +115,49 @@ export class Timeline {
             //     this._loadContextEntriesWhereNeeded(entries.entries);
             //     this._setupEntries(entries.entries);
             // }
-            console.log('entries.entries:', entries.entries, textContent)
+            // console.log('entries.entries:', entries.entries, textContent)
             const filteredEntries = (entries.entries || []).filter(e => {
                 const eventContent = e?._eventEntry?.event?.content
                 if (eventContent && eventContent.msgtype === 'm.text') {
-                    return (eventContent.body || '').toLowerCase().includes(textContent.toLowerCase())
+                    const contentBodys = eventContent.body.split('\n\n')
+                    const contentBody = contentBodys[contentBodys.length - 1] || ''
+                    return contentBody.toLowerCase().includes(textContent.toLowerCase())
                 }
                 return false
             })
-            console.log('ZZQ filteredEntries:', filteredEntries)
+            // console.log('ZZQ filteredEntries:', filteredEntries)
             return filteredEntries
         } catch (e) {
             this._disposables.disposeTracked(readerRequest);
             return {}
         }
     }
+    async searchAroundEvents(eventId, log) {
+        const readerRequest = this._disposables.track(this._timelineReader.findEventUntilEnd2(eventId, log));
+        try {
+            const entries = await readerRequest.complete();
+            // console.log('timeline searchAroundEvents: ', entries)
+            if (entries.found) {
+                this.addEntries(entries.entries);
+            }
+            return entries
+        } catch (e) {
+            // console.log('timeline searchAroundEvents: err', e)
+            this._disposables.disposeTracked(readerRequest);
+            return {}
+        }
+        // do clear TODO !!!!
+    }
+
     loadEventEntries(entries) {
         try {
             this._loadContextEntriesWhereNeeded(entries);
             this._setupEntries(entries);
+        } finally { }
+    }
+    clearTimeline() {
+        try {
+            this._remoteEntries.removeAll()
         } finally { }
     }
 
@@ -151,7 +175,9 @@ export class Timeline {
         } else {
             this._localEntries = new ObservableArray();
         }
+        // console.log('timeline _setupEntries:A:', this._remoteEntries, this._localEntries, timelineEntries)
         this._allEntries = new ConcatList(this._remoteEntries, this._localEntries);
+        // console.log('timeline _setupEntries:', this._allEntries)
     }
 
     async _mapPendingEventToEntry(pe) {
@@ -203,6 +229,13 @@ export class Timeline {
                 e => e.id === eventId,
                 updateOrFalse
             );
+        }
+    }
+    _updateCurrentAllUnreadEvent(readDataTs) {
+        for (const ety of this._remoteEntries) {
+            if (ety instanceof EventEntry) {
+                this._remoteEntries.getAndUpdate(ety, Timeline._entryUpdater);
+            }
         }
     }
 

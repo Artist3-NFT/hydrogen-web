@@ -91,24 +91,6 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
                 title: "Jump down",
                 onClick: async () => {
                     this.jumpDown()
-                    // console.log('this.jumpDown():', vm, (vm as any)._options.room.loadEventsFromServer);
-                    // // (vm as any)._timeline.searchEventUtil('$hzO0jmWGPq-JVRWlUL8QSXPNj4uygKUV_yxvD4FNCvc')
-                    // try {
-                    //     const res = await (vm as any)._options.room.loadEventsFromServer('$hzO0jmWGPq-JVRWlUL8QSXPNj4uygKUV_yxvD4FNCvc')
-                    //     console.log('ZZQ res:', res)
-                    // } finally {
-                    //     console.log('ZZQ ZZQ:')
-                    // }
-
-                    // console.log('this.jumpDown():', vm, (vm as any)._timeline._timelineReader?.findEventUntilEnd);
-                    // if ((vm as any)._timeline._timelineReader?.findEventUntilEnd) {
-                    //     const res = (vm as any)._timeline._timelineReader?.findEventUntilEnd('$hzO0jmWGPq-JVRWlUL8QSXPNj4uygKUV_yxvD4FNCvc')
-                    //     console.log('res:', res)
-                    //     const res2 = await res.complete()
-                    //     console.log('res2:', res2)
-                    //     const target = res2.find(r => r.id === '$hzO0jmWGPq-JVRWlUL8QSXPNj4uygKUV_yxvD4FNCvc')
-                    //     console.log('target:', target)
-                    // }
                 }
             })
         ]);
@@ -181,6 +163,7 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
     }
 
     private onScroll(): void {
+        if ((window as any).onTimelineScrollDisabled) return
         const { scrollNode, tilesNode } = this;
         const { scrollHeight, scrollTop, clientHeight } = scrollNode;
         let bottomNodeIndex;

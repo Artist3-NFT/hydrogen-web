@@ -28,6 +28,7 @@ export class BaseMessageTile extends SimpleTile {
         this._isSameDay = false;
         this._isNewOwn = false;
         this._reactions = null;
+        this._isReadAlready = false;
         this._threadAnchor = null;
         this._replyTile = null;
         if (this._entry.annotations || this._entry.pendingAnnotations) {
@@ -123,7 +124,14 @@ export class BaseMessageTile extends SimpleTile {
         return this._entry.content;
     }
 
+    get isReadAlreay() {
+        const readData = this._room.getReadData
+        console.log('readData:', readData, (readData - this._entry._eventEntry?.event?.origin_server_ts))
+        return !!readData && readData > (this._entry._eventEntry?.event?.origin_server_ts || Number.MAX_SAFE_INTEGER)
+    }
+
     updatePreviousSibling(prev) {
+        console.log('updatePreviousSibling: !!!')
         super.updatePreviousSibling(prev);
         let isContinuation = false;
         if (prev && prev instanceof BaseMessageTile && prev.sender === this.sender) {
@@ -137,6 +145,10 @@ export class BaseMessageTile extends SimpleTile {
             this._isContinuation = isContinuation;
             this.emitChange("isContinuation");
         }
+        // if (this._isReadAlready !== this._room.getReadData) {
+        //     this._isReadAlready = this._room.getReadData;
+        //     this.emitChange("isReadAlreay");
+        // }
         if (prev && (prev instanceof BaseMessageTile || prev instanceof RoomMemberTile) && prev.date === this.date) {
             this._isSameDay = true;
             this.emitChange("isSameDay");
@@ -265,6 +277,7 @@ export class BaseMessageTile extends SimpleTile {
     }
 
     _updateReactions() {
+        console.log('_updateReactions !!')
         const { annotations, pendingAnnotations } = this._entry;
         if (!annotations && !pendingAnnotations) {
             if (this._reactions) {

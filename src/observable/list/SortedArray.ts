@@ -103,6 +103,13 @@ export class SortedArray<T> extends BaseObservableList<T> {
         this._items.splice(idx, 1);
         this.emitRemove(idx, item);
     }
+    removeAll() {
+        for (let index = 0; index < this._items.length; index++) {
+            const element = this._items[index];
+            this.emitRemove(index, element);
+        }
+        this._items = []
+    }
 
     get array(): T[] {
         return this._items;

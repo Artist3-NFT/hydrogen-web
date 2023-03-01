@@ -110,6 +110,25 @@ export class Room extends BaseRoom {
             }, parentLog.level.Detail);
         }
     }
+    traverseAndFlatten(currentNode, target, flattenedKey) {
+        for (var key in currentNode) {
+            if (currentNode.hasOwnProperty(key)) {
+                var newKey;
+                if (flattenedKey === undefined) {
+                    newKey = key;
+                } else {
+                    newKey = flattenedKey + '.' + key;
+                }
+
+                var value = currentNode[key];
+                if (typeof value === "object") {
+                    this.traverseAndFlatten(value, target, newKey);
+                } else {
+                    target[newKey] = value;
+                }
+            }
+        }
+    }
 
     /** @package */
     async writeSync(roomResponse, isInitialSync, { summaryChanges, decryptChanges, roomEncryption, retryEntries }, txn, log) {
@@ -120,6 +139,21 @@ export class Room extends BaseRoom {
             // so no old state sticks around
             txn.roomState.removeAllForRoom(this.id);
             txn.roomMembers.removeAllForRoom(this.id);
+        }
+        summaryChanges.newRead = false
+        if ((roomResponse.ephemeral?.events || []).length > 0) {
+            const receiptsArr = roomResponse.ephemeral.events.filter(eph => eph.type === 'm.receipt')
+            if (receiptsArr) {
+                const readDataFinal = {}
+                this.traverseAndFlatten(receiptsArr[0].content, readDataFinal)
+                const recriptsData = Object.entries(readDataFinal)
+                const targetReceipt = recriptsData.find(data => !data[0].includes(`${this._user.id}`))
+                if (targetReceipt) {
+                    summaryChanges = summaryChanges.cloneIfNeeded()
+                    summaryChanges.setNewReadData(targetReceipt[1]);
+                    summaryChanges.newRead = true
+                }
+            }
         }
         const { entries: newEntries, updatedEntries, newLiveKey, memberChanges } =
             await log.wrap("syncWriter", log => this._syncWriter.writeSync(
@@ -231,12 +265,16 @@ export class Room extends BaseRoom {
             }
         }
         let emitChange = false;
+        console.log('ZZQ 2333 summaryChanges:', summaryChanges)
         if (summaryChanges) {
             this._summary.applyChanges(summaryChanges);
             if (!this._summary.data.needsHeroes) {
                 this._heroes = null;
             }
             emitChange = true;
+            if (summaryChanges.newRead) {
+                this._timeline._updateCurrentAllUnreadEvent(summaryChanges.readData);
+            }
         }
         if (this._heroes && heroChanges) {
             const oldName = this.name;
@@ -257,6 +295,7 @@ export class Room extends BaseRoom {
             this._timeline.addEntries(newEntries);
         }
         if (this._observedEvents) {
+            console.log('this._observedEvents !!!')
             this._observedEvents.updateEvents(updatedEntries);
             this._observedEvents.updateEvents(newEntries);
         }
@@ -423,6 +462,10 @@ export class Room extends BaseRoom {
 
     get isUnread() {
         return this._summary.data.isUnread;
+    }
+
+    get getReadData() {
+        return this._summary.data.readData;
     }
 
     get notificationCount() {
