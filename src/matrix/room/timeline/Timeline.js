@@ -231,7 +231,7 @@ export class Timeline {
             );
         }
     }
-    _updateCurrentAllUnreadEvent(readDataTs) {
+    _updateCurrentAllUnreadEvent() {
         for (const ety of this._remoteEntries) {
             if (ety instanceof EventEntry) {
                 this._remoteEntries.getAndUpdate(ety, Timeline._entryUpdater);

@@ -141,7 +141,18 @@ export class RelationWriter {
             return false;
         }
 
+        let {annotationList} = targetStorageEntry;
+        if (!annotationList) {
+            targetStorageEntry.annotationList = annotationList = [];
+        }
+        targetStorageEntry.annotationList.push({
+            key: relation.key,
+            sender: annotationEvent.user_id || annotationEvent.sender,
+            timestamp: annotationEvent.origin_server_ts,
+        })
+
         let {annotations} = targetStorageEntry;
+        console.log('AA annotations:', JSON.stringify(annotations))
         if (!annotations) {
             targetStorageEntry.annotations = annotations = {};
         }
@@ -155,6 +166,7 @@ export class RelationWriter {
         }
         const sentByMe = annotationEvent.sender === this._ownUserId;
 
+        annotation.sender = annotationEvent.sender;
         annotation.me = annotation.me || sentByMe;
         annotation.count += 1;
         annotation.firstTimestamp = Math.min(
@@ -187,6 +199,7 @@ export class RelationWriter {
         delete target.annotations[key];
         if (isObjectEmpty(target.annotations)) {
             delete target.annotations;
+            delete target.annotationList;
         }
         await Promise.all(relations.map(async relation => {
             const annotation = await txn.timelineEvents.getByEventId(this._roomId, relation.sourceEventId);

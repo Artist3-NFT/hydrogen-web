@@ -26,6 +26,7 @@ interface Annotation {
     count: number;
     me: boolean;
     firstTimestamp: number;
+    sender: string;
 }
 
 interface TimelineEventEntry {

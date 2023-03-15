@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {BaseMediaView} from "./BaseMediaView.js";
-import {domEventAsPromise} from "../../../../dom/utils.js";
+import { BaseMediaView } from "./BaseMediaView.js";
+import { domEventAsPromise } from "../../../../dom/utils.js";
 
 export class VideoView extends BaseMediaView {
     renderMedia(t) {
@@ -28,7 +28,7 @@ export class VideoView extends BaseMediaView {
             preload: "none",
             poster: vm => vm.thumbnailUrl,
             onPlay: this._onPlay.bind(this),
-            style: vm => `max-width: ${vm.width}px; max-height: ${vm.height}px;${vm.isPending ? "z-index: -1": ""}`
+            style: vm => `max-width: ${isNaN(vm.width) ? 480 : vm.width}px; max-height: ${isNaN(vm.height) ? 480 : vm.height}px;${vm.isPending ? "z-index: -1" : ""}`
         });
 
         video.addEventListener("error", this._onError.bind(this));
@@ -51,8 +51,8 @@ export class VideoView extends BaseMediaView {
                 video.load();
                 await loadPromise;
                 video.play();
-            } catch (err) {/* errors are already caught in error event handler */}
-        }  
+            } catch (err) {/* errors are already caught in error event handler */ }
+        }
     }
 
     _onError(evt) {

@@ -151,6 +151,10 @@ function processTimelineEvent(data, eventEntry, isInitialSync, canMarkUnread, ow
             data.lastMessageTimestamp = eventEntry.timestamp;
             data.lastMessageContent = eventEntry.content?.body || '';
             data.lastMessageContent = data.lastMessageContent.substring(data.lastMessageContent.lastIndexOf('\n\n'))
+            data.lastMessageIsOwn = eventEntry.sender === ownUserId
+            if (data.lastMessageIsOwn) {
+                data.notificationCount = 0;
+            }
         }
         if (!isInitialSync && eventEntry.sender !== ownUserId && canMarkUnread) {
             data = data.cloneIfNeeded();
@@ -188,6 +192,7 @@ export class SummaryData {
         this.name = copy ? copy.name : null;
         this.lastMessageTimestamp = copy ? copy.lastMessageTimestamp : null;
         this.lastMessageContent = copy ? copy.lastMessageContent : null;
+        this.lastMessageIsOwn = copy ? copy.lastMessageIsOwn : null;
         this.isUnread = copy ? copy.isUnread : false;
         this.encryption = copy ? copy.encryption : null;
         this.membership = copy ? copy.membership : null;

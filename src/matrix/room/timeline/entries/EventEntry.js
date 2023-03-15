@@ -140,6 +140,9 @@ export class EventEntry extends BaseEventEntry {
     get annotations() {
         return this._eventEntry.annotations;
     }
+    get annotationList() {
+        return this._eventEntry.annotationList;
+    }
 
     get relation() {
         const originalContent = this._eventEntry.event.content;

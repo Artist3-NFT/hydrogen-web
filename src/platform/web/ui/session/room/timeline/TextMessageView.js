@@ -72,7 +72,17 @@ export class TextMessageView extends BaseMessageView {
                 window.currentRoomMentions.push(container)
             }
         }
-        if (window.emojione && window.emojione?.toImage && vm._format === 'Plain') {
+        const singleEmojiRegex = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])$/
+        const isSingleEmoji = singleEmojiRegex.test(container.innerText)
+        if (vm._format === 'Plain' && isSingleEmoji) {
+            const hex = container.innerText.codePointAt(0).toString(16)
+            container.innerHTML = `
+                <picture>
+                    <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/${hex}/512.webp" type="image/webp">
+                    <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/${hex}/512.gif" alt="${container.innerText}" width="84" height="84">
+                </picture>
+            `
+        } else if (window.emojione && window.emojione?.toImage && vm._format === 'Plain') {
             container.innerHTML = window.emojione?.toImage?.(container.innerHTML)
         }
         return container;

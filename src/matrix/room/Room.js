@@ -265,7 +265,6 @@ export class Room extends BaseRoom {
             }
         }
         let emitChange = false;
-        console.log('ZZQ 2333 summaryChanges:', summaryChanges)
         if (summaryChanges) {
             this._summary.applyChanges(summaryChanges);
             if (!this._summary.data.needsHeroes) {
@@ -273,7 +272,7 @@ export class Room extends BaseRoom {
             }
             emitChange = true;
             if (summaryChanges.newRead) {
-                this._timeline._updateCurrentAllUnreadEvent(summaryChanges.readData);
+                this._timeline?._updateCurrentAllUnreadEvent?.();
             }
         }
         if (this._heroes && heroChanges) {
@@ -295,7 +294,6 @@ export class Room extends BaseRoom {
             this._timeline.addEntries(newEntries);
         }
         if (this._observedEvents) {
-            console.log('this._observedEvents !!!')
             this._observedEvents.updateEvents(updatedEntries);
             this._observedEvents.updateEvents(newEntries);
         }
@@ -490,6 +488,16 @@ export class Room extends BaseRoom {
             return eventEntry?.event?.event_id;
         }
     }
+    async _getLastEventData() {
+        const lastKey = this._syncWriter.lastMessageKey;
+        if (lastKey) {
+            const txn = await this._storage.readTxn([
+                this._storage.storeNames.timelineEvents,
+            ]);
+            const eventEntry = await txn.timelineEvents.get(this._roomId, lastKey);
+            return eventEntry?.event;
+        }
+    }
 
     async clearUnread(log = null) {
         if (this.isUnread || this.notificationCount) {
@@ -508,11 +516,12 @@ export class Room extends BaseRoom {
                 await txn.complete();
                 this._summary.applyChanges(data);
                 this._emitUpdate();
-
                 try {
-                    const lastEventId = await this._getLastEventId();
-                    if (lastEventId) {
-                        await this._hsApi.receipt(this._roomId, "m.read", lastEventId);
+                    const lastEventData = await this._getLastEventData();
+                    if (lastEventData.origin_server_ts > this._summary.data.readData) {
+                        if (lastEventData.event_id) {
+                            await this._hsApi.receipt(this._roomId, "m.read", lastEventData.event_id);
+                        }
                     }
                 } catch (err) {
                     // ignore ConnectionError

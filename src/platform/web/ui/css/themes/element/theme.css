@@ -1409,6 +1409,9 @@ ul.menu .menu-item {
 .msg-vertical li.icon.msg-menu-more-pin .menu-item {
     background-image: url('icons/pin.svg?primary=icon-color');
 }
+.msg-vertical li.icon.msg-menu-more-reactionList .menu-item {
+    background-image: url('icons/heart-2.svg?primary=icon-color');
+}
 
 .msg-vertical li.icon.msg-menu-more-emoji .menu-item {
     background-image: url('icons/smile.svg?primary=icon-color');

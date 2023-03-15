@@ -229,6 +229,11 @@ export class BaseMessageView extends TemplateView {
                 // e.content = vm._getContent()
             }).setIcon('msg-menu-more-thread').setData(`${vm.sender}`));
         }
+        if ((vm._entry.annotationList || []).length > 0) {
+            options.push(Menu.option(`${(vm._entry.annotationList || []).length} reactions`, (e) => {
+                e.reactionList = (vm._entry.annotationList || [])
+            }).setIcon('msg-menu-more-reactionList').setData(`${vm.sender}`));
+        }
         if (vm._format === 'Plain' || vm._format === 'Html') {
             options.push(Menu.option(vm.i18n`Copy message`, () => {
                 const parts = vm?._messageBody?.parts || []
@@ -251,7 +256,7 @@ export class BaseMessageView extends TemplateView {
         this._menuPopup = new Popup(new Menu(options, vm.isOwn ? 'msg-vertical is-own-menu' : 'msg-vertical'), onClose);
         this._menuPopup.trackInTemplateView(this);
         this._menuPopup.showRelativeTo(button, 2);
-
+        console.log('zzzzzz ,', vm, vm.annotations, vm._entry.annotationList)
     }
 
     createMenuOptions(vm, target) {

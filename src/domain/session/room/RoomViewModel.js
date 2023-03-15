@@ -97,7 +97,7 @@ export class RoomViewModel extends ViewModel {
         if (this._room.isArchived || this._clearUnreadTimout) {
             return;
         }
-        this._clearUnreadTimout = this.clock.createTimeout(2000);
+        this._clearUnreadTimout = this.clock.createTimeout(100);
         try {
             await this._clearUnreadTimout.elapsed();
             await this._room.clearUnread();
@@ -271,13 +271,11 @@ export class RoomViewModel extends ViewModel {
     }
     async searchTextLocal(textContent) {
         const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventByTextLocal(textContent)
-        // console.log('ZZQ searchTextLocal loadAndFindUtilRes:', loadAndFindUtilRes)
         return loadAndFindUtilRes
     }
     async searchTextServer(textContent) {
         await this._timelineVM._options.room.loadEventsFromServer()
         const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventByTextLocal(textContent)
-        // console.log('ZZQ searchTextServer loadAndFindUtilRes:', loadAndFindUtilRes)
         return loadAndFindUtilRes
     }
     async loadAroundEventById(eventId) {
@@ -287,22 +285,17 @@ export class RoomViewModel extends ViewModel {
         // search 
         const loadAndFindUtilRes = await this._timelineVM._timeline.searchEventUtil(eventId)
         if (loadAndFindUtilRes.found) {
-            // console.log('loadUtilEvent:: found!!')
             return true
             // scroll to the event
         } else {
-            // console.log('loadUtilEvent:: NO NO NO NO!! Not found!!')
             await this.loadEventsFromServer(eventId)
             const loadAndFindUtilRes2 = await this._timelineVM._timeline.searchEventUtil(eventId)
-            // console.log('loadAndFindUtilRes2::', loadAndFindUtilRes2)
             return !!loadAndFindUtilRes2.found
         }
     }
     async _setPinnedMessage(eventId) {
-        // console.log('this._timelineVM:', this._timelineVM, this._timelineVM._options.tileOptions.roomVM)
         // const resSearch = await this.loadUtilEvent("$xf2vDOy0xZJ-Ex_mAO5RVQtc0grUFh31zWqVX56qY5M")
         // // const resSearch = await this.searchTextServer('22')
-        // console.log('resSearch;". ', resSearch)
         if (!this._room.isArchived && eventId) {
             try {
                 await this.updatePinnedMessage()
@@ -375,6 +368,21 @@ export class RoomViewModel extends ViewModel {
             const file = await this.platform.openFile();
             if (!file) {
                 return;
+            }
+            console.log('file.blob.mimeType:', file, file.blob.mimeType)
+            const aatachmentMaxSize = 50 * 1024 * 1024;
+            if (file.blob.size > aatachmentMaxSize) {
+                event.videoOversized = true
+                event?.videoOversizedAlert?.()
+                return
+            }
+            const rightFileType = file.blob.mimeType.includes('xml') || file.blob.mimeType.includes('text/plain') ||
+                file.blob.mimeType.includes('word') || file.blob.mimeType.includes('pdf') ||
+                file.blob.mimeType.includes('powerpoint') || file.blob.mimeType.includes('officedocument') ||
+                file.blob.mimeType.includes('excel')
+            if (!rightFileType) {
+                event?.videoTypeUnsupport?.()
+                return
             }
             event.attachSent = true
             return this._sendFile(file);
