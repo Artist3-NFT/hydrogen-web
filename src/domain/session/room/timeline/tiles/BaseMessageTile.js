@@ -32,7 +32,6 @@ export class BaseMessageTile extends SimpleTile {
         this._threadAnchor = null;
         this._replyTile = null;
         if (this._entry.annotations || this._entry.pendingAnnotations) {
-            console.log('this._entry AAAA :', this._entry, this._entry.annotationList)
             this._updateReactions();
             this._updateThreadAnchor();
         }

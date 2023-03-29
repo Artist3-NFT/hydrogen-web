@@ -143,7 +143,7 @@ export class Room extends BaseRoom {
         summaryChanges.newRead = false
         if ((roomResponse.ephemeral?.events || []).length > 0) {
             const receiptsArr = roomResponse.ephemeral.events.filter(eph => eph.type === 'm.receipt')
-            if (receiptsArr) {
+            if (receiptsArr && receiptsArr.length > 0) {
                 const readDataFinal = {}
                 this.traverseAndFlatten(receiptsArr[0].content, readDataFinal)
                 const recriptsData = Object.entries(readDataFinal)
@@ -153,6 +153,12 @@ export class Room extends BaseRoom {
                     summaryChanges.setNewReadData(targetReceipt[1]);
                     summaryChanges.newRead = true
                 }
+            }
+            const typingDataArr = roomResponse.ephemeral.events.filter(eph => eph.type === 'm.typing')
+            if (typingDataArr && typingDataArr.length > 0) {
+                const typingArr = typingDataArr[0].content?.user_ids || []
+                summaryChanges = summaryChanges.cloneIfNeeded()
+                summaryChanges.typing = typingArr
             }
         }
         const { entries: newEntries, updatedEntries, newLiveKey, memberChanges } =
@@ -499,6 +505,9 @@ export class Room extends BaseRoom {
         }
     }
 
+    async markTyping() {
+        this._hsApi.typing(this._roomId, this._user.id);
+    }
     async clearUnread(log = null) {
         if (this.isUnread || this.notificationCount) {
             return await this._platform.logger.wrapOrRun(log, "clearUnread", async log => {

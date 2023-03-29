@@ -156,6 +156,10 @@ export class HomeServerApi {
             {}, {}, options);
     }
 
+    typing(roomId: string, userId: string, options?: BaseRequestOptions): IHomeServerRequest {
+        return this._put(`/rooms/${encodeURIComponent(roomId)}/typing/${encodeURIComponent(userId)}`, {}, {timeout: 6000, typing: true}, options);
+    }
+
     state(roomId: string, eventType: string, stateKey: string, options?: BaseRequestOptions): IHomeServerRequest {
         return this._get(`/rooms/${encodeURIComponent(roomId)}/state/${encodeURIComponent(eventType)}/${encodeURIComponent(stateKey)}`, {}, undefined, options);
     }

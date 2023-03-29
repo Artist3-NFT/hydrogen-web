@@ -77,9 +77,11 @@ export class TextMessageView extends BaseMessageView {
         if (vm._format === 'Plain' && isSingleEmoji) {
             const hex = container.innerText.codePointAt(0).toString(16)
             container.innerHTML = `
-                <picture>
+                <picture class="dynamic-emoji-imger-container">
                     <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/${hex}/512.webp" type="image/webp">
-                    <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/${hex}/512.gif" alt="${container.innerText}" width="84" height="84">
+                    <img class="dynamic-emoji-imger" src="https://fonts.gstatic.com/s/e/notoemoji/latest/${hex}/512.gif" 
+                    onerror="this.classList.add('dynamic-emoji-imger-broken')"
+                    alt="${container.innerText}" width="84" height="84">
                 </picture>
             `
         } else if (window.emojione && window.emojione?.toImage && vm._format === 'Plain') {

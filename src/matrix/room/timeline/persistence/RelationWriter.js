@@ -152,7 +152,6 @@ export class RelationWriter {
         })
 
         let {annotations} = targetStorageEntry;
-        console.log('AA annotations:', JSON.stringify(annotations))
         if (!annotations) {
             targetStorageEntry.annotations = annotations = {};
         }

@@ -93,6 +93,13 @@ export class RoomViewModel extends ViewModel {
         recreateComposer(oldCanSendMessage);
     }
 
+    uploadTyping() {
+        if (this._room.isArchived) {
+            return;
+        }
+        this._room.markTyping();
+    }
+
     async _clearUnreadAfterDelay() {
         if (this._room.isArchived || this._clearUnreadTimout) {
             return;
