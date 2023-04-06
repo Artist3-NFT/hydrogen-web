@@ -210,6 +210,7 @@ export class SummaryData {
         this.dmUserId = copy ? copy.dmUserId : null;
         this.cloned = copy ? true : false;
         this.readData = copy ? copy.readData : 0;
+        this.typing = copy ? copy.typing : [];
     }
 
     changedKeys(other) {
@@ -253,6 +254,9 @@ export class SummaryData {
     }
     setNewReadData(ts) {
         return this.readData = ts;
+    }
+    setTyping(typing) {
+        return this.typing = typing;
     }
 }
 

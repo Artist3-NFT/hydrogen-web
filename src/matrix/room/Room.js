@@ -189,7 +189,6 @@ export class Room extends BaseRoom {
         // also apply (decrypted) timeline entries to the summary changes
         summaryChanges = summaryChanges.applyTimelineEntries(
             allEntries, isInitialSync, !this._isTimelineOpen, this._user.id);
-
         // if we've have left the room, remove the summary
         if (summaryChanges.membership !== "join") {
             txn.roomSummary.remove(this.id);
