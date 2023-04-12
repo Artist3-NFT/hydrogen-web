@@ -369,6 +369,23 @@ export class RoomViewModel extends ViewModel {
         }
         return false;
     }
+    async _sendTxMessage(message) {
+        // { txHash: 'dsadasd', type: 1, tokenData: IToken, message: 'hello', value: '0.213BTC' }
+        if (!this._room.isArchived && message) {
+            let messinfo = { ...message, msgtype: "m.tx", body: message.message };
+            try {
+                const res = await this._room.sendEvent("m.room.message", {...messinfo});
+                return res
+            } catch (err) {
+                console.error(`room._sendTxMessage(): ${err.message}:\n${err.stack}`);
+                this._sendError = err;
+                this._timelineError = null;
+                this.emitChange("error");
+                return false;
+            }
+        }
+        return false;
+    }
 
     async _pickAndSendFile(event) {
         try {

@@ -18,6 +18,7 @@ import {TextMessageView} from "./timeline/TextMessageView.js";
 import {ImageView} from "./timeline/ImageView.js";
 import {VideoView} from "./timeline/VideoView.js";
 import {FileView} from "./timeline/FileView.js";
+import {TxView} from "./timeline/TxView.js";
 import {LocationView} from "./timeline/LocationView.js";
 import {MissingAttachmentView} from "./timeline/MissingAttachmentView.js";
 import {AnnouncementView} from "./timeline/AnnouncementView.js";
@@ -41,6 +42,8 @@ export function viewClassForTile(vm: SimpleTile): TileViewConstructor {
             return VideoView;
         case "file":
             return FileView;
+        case "tx":
+            return TxView;
         case "location":
             return LocationView;
         case "missing-attachment":

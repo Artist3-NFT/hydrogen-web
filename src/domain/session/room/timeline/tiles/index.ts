@@ -16,6 +16,7 @@ limitations under the License.
 
 import {GapTile} from "./GapTile.js";
 import {TextTile} from "./TextTile.js";
+import {TxTile} from "./TxTile.js";
 import {RedactedTile} from "./RedactedTile.js";
 import {ImageTile} from "./ImageTile.js";
 import {VideoTile} from "./VideoTile.js";
@@ -63,6 +64,8 @@ export function tileClassForEntry(entry: TimelineEntry): TileConstructor | undef
                     case "m.notice":
                     case "m.emote":
                         return TextTile;
+                    case "m.tx":
+                        return TxTile;
                     case "m.image":
                         return ImageTile;
                     case "m.video":

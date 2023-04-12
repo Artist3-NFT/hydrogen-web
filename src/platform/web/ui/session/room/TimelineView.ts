@@ -78,7 +78,7 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
             this.restoreScrollPosition();
         });
         this.tilesView = new TilesListView(vm.tiles, () => this.restoreScrollPosition(), this.viewClassForTile);
-        const root = t.div({className: "Timeline"}, [
+        const root = t.div({ className: "Timeline" }, [
             t.div({
                 className: "Timeline_scroller bottom-aligned-scroll",
                 onScroll: () => this.onScroll()
@@ -92,7 +92,18 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
                 onClick: async () => {
                     this.jumpDown()
                 }
-            })
+            }),
+            // t.button({
+            //     className: {
+            //         "Timeline_jumpDown": true,
+            //         hidden: vm => !vm.showJumpDown
+            //     },
+            //     title: "Jump down",
+            //     onClick: async () => {
+            //         console.log('ZZQ:', vm, (vm as any)._options.tileOptions.roomVM);
+            //         (vm as any)._options.tileOptions.roomVM._sendTxMessage({ txHash: 'dsadasd', type: 1, tokenData: { a: 123 }, message: 'hello', value: '0.213BTC' })
+            //     }
+            // })
         ]);
 
         if (typeof ResizeObserver === "function") {

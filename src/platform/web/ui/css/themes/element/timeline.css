@@ -775,12 +775,29 @@ only loads when the top comes into view*/
     align-items: center;
     cursor: pointer;
 }
+.tx-message .tx-card {
+    height: 48px;
+    padding: 0 16px 0 8px;
+    width: 300px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
 
 .file-message .file-card .file-card-image {
     width: 40px;
     height: 40px;
     margin-right: 8px;
     background-image: url('icons/file-card.svg?primary=icon-color');
+    background-size: contain;
+}
+.tx-message .tx-card .tx-card-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 8px;
+    /* background-image: url('icons/file-card.svg?primary=icon-color'); */
     background-size: contain;
 }
 
@@ -794,8 +811,21 @@ only loads when the top comes into view*/
     position: relative;
     display: inline-block;
 }
+.tx-message .tx-card .tx-card-txt {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 4px;
+    padding-bottom: 10px;
+    position: relative;
+    display: inline-block;
+}
 
 .file-message .file-card .file-card-txt:hover .file-card-tooltip {
+    visibility: visible;
+}
+.tx-message .tx-card .tx-card-txt:hover .tx-card-tooltip {
     visibility: visible;
 }
 
@@ -814,8 +844,28 @@ only loads when the top comes into view*/
     bottom: 60px;
     z-index: 1;
 }
+.tx-message .tx-card .tx-card-txt .tx-card-tooltip {
+    visibility: hidden;
+    width: 320px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 6px 12px;
+    font-size: 12px;
+    line-height: 16px;
+    border-radius: 6px;
+    position: absolute;
+    right: 0;
+    bottom: 60px;
+    z-index: 1;
+}
 
 .file-message .file-card .file-card-txt .file-card-content {
+    font-size: 12px;
+    height: 16px;
+    line-height: 16px;
+}
+.tx-message .tx-card .tx-card-txt .tx-card-content {
     font-size: 12px;
     height: 16px;
     line-height: 16px;
@@ -854,5 +904,5 @@ only loads when the top comes into view*/
 }
 
 .bottom-menu li.icon.token {
-    background-image: url("./icons/token.svg?primary=icon-color");
+    background-image: url("./icons/parachute.svg?primary=icon-color");
 }
