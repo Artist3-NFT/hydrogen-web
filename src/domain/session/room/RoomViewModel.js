@@ -339,6 +339,20 @@ export class RoomViewModel extends ViewModel {
             return res
         }
     }
+    async checkSDKWorkingStatus() {
+        if (this._room.isArchived) {
+            return false;
+        }
+        try {
+            const testLastEventId = await this._room._getLastEventId()
+            if (!testLastEventId) {
+                return false;
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
     async _sendMessage(message, replyingTo) {
         if (!this._room.isArchived && message) {
             let messinfo = { type: "m.text", message: message };
@@ -374,7 +388,7 @@ export class RoomViewModel extends ViewModel {
         if (!this._room.isArchived && message) {
             let messinfo = { ...message, msgtype: "m.tx", body: message.message };
             try {
-                const res = await this._room.sendEvent("m.room.message", {...messinfo});
+                const res = await this._room.sendEvent("m.room.message", { ...messinfo });
                 return res
             } catch (err) {
                 console.error(`room._sendTxMessage(): ${err.message}:\n${err.stack}`);

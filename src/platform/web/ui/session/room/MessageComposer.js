@@ -17,6 +17,7 @@ limitations under the License.
 import { TemplateView } from "../../general/TemplateView";
 import { Popup } from "../../general/Popup.js";
 import { Menu } from "../../general/Menu.js";
+import { regex } from "../../../../../domain/session/room/timeline/linkify/regex";
 
 export class MessageComposer extends TemplateView {
     constructor(viewModel, viewClassForTile) {
@@ -96,6 +97,13 @@ export class MessageComposer extends TemplateView {
                         if (!!vm.replyViewModel) {
                             event.replingSender = vm.replyViewModel.sender
                         }
+                        if (!window.allow31) {
+                            const matches = regex.test(this._input.value);
+                            if (matches) {
+                                event.allow31Controlled = true
+                                return
+                            }
+                        }
                         event.mData2 = this._input.value
                         event.onDataGet = (newMessageData) => {
                             event.mData = newMessageData
@@ -162,6 +170,13 @@ export class MessageComposer extends TemplateView {
                 event.replingSender = vm.replyViewModel.sender
             }
             event.preventDefault();
+            if (!window.allow31) {
+                const matches = regex.test(this._input.value);
+                if (matches) {
+                    event.allow31Controlled = true
+                    return
+                }
+            }
             event.mData2 = this._input.value
             event.onDataGet = (newMessageData) => {
                 event.mData = newMessageData

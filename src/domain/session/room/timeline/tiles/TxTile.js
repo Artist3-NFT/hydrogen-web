@@ -36,7 +36,7 @@ export class TxTile extends BaseMessageTile {
     }
     get message() {
         const content = this._getContent();
-        return content?.message || `I'm sending a Airdrop.`;
+        return content?.message || `🎁 Mystery Box 🎁`;
     }
 
     get shape() {
