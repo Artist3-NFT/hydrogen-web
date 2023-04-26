@@ -17,7 +17,7 @@ limitations under the License.
 import { TemplateView } from "../../general/TemplateView";
 import { Popup } from "../../general/Popup.js";
 import { Menu } from "../../general/Menu.js";
-import { regex } from "../../../../../domain/session/room/timeline/linkify/regex";
+import { regex2 } from "../../../../../domain/session/room/timeline/linkify/regex";
 
 export class MessageComposer extends TemplateView {
     constructor(viewModel, viewClassForTile) {
@@ -98,7 +98,7 @@ export class MessageComposer extends TemplateView {
                             event.replingSender = vm.replyViewModel.sender
                         }
                         if (!window.allow31) {
-                            const matches = regex.test(this._input.value);
+                            const matches = regex2.test(this._input.value);
                             if (matches) {
                                 event.allow31Controlled = true
                                 return
@@ -171,7 +171,7 @@ export class MessageComposer extends TemplateView {
             }
             event.preventDefault();
             if (!window.allow31) {
-                const matches = regex.test(this._input.value);
+                const matches = regex2.test(this._input.value);
                 if (matches) {
                     event.allow31Controlled = true
                     return

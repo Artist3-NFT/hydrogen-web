@@ -47,3 +47,4 @@ Things to keep in mind:
 const urlRegex = `${scheme}${host}${pathOrFragment}?`;
 
 export const regex = new RegExp(urlRegex, "gi");
+export const regex2 = new RegExp(urlRegex);
