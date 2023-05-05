@@ -400,6 +400,22 @@ export class RoomViewModel extends ViewModel {
         }
         return false;
     }
+    async _sendClaimMessage(message) {
+        if (!this._room.isArchived && message) {
+            let messinfo = { ...message, msgtype: "m.claim", body: message.message };
+            try {
+                const res = await this._room.sendEvent("m.room.message", { ...messinfo });
+                return res
+            } catch (err) {
+                console.error(`room._sendTxMessage(): ${err.message}:\n${err.stack}`);
+                this._sendError = err;
+                this._timelineError = null;
+                this.emitChange("error");
+                return false;
+            }
+        }
+        return false;
+    }
 
     async _pickAndSendFile(event) {
         try {

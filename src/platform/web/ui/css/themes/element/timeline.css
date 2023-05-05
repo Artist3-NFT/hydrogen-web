@@ -54,6 +54,28 @@ limitations under the License.
     position: relative;
 }
 
+.Timeline_message.message-claim {
+    width: 100%;
+    max-width: 100%;
+    pointer-events: none;
+}
+
+.Timeline_message.message-claim .Timeline_messageOptions3,
+.Timeline_message.message-claim .Timeline_messageAvatar,
+.Timeline_message.message-claim .timeReactContainer {
+    display: none;
+}
+
+.Timeline_message.message-claim .claim-card {
+    padding-right: 64px;
+}
+
+.Timeline_message.message-claim .claim-card .claim-card-txt {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
 .Timeline_message.newDay:not(.continuation):not(.disabled) {
     margin-top: 72px !important;
     margin-bottom: 0px;
@@ -225,7 +247,7 @@ limitations under the License.
     }
 } */
 
-.Timeline_message:hover:not(.disabled),
+.Timeline_message:hover:not(.disabled.message-claim),
 .Timeline_message.selected,
 .Timeline_message.menuOpen {
     /* needs transparency support */
@@ -775,6 +797,7 @@ only loads when the top comes into view*/
     align-items: center;
     cursor: pointer;
 }
+
 .tx-message .tx-card {
     height: 48px;
     padding: 0 16px 0 8px;
@@ -793,6 +816,7 @@ only loads when the top comes into view*/
     background-image: url('icons/file-card.svg?primary=icon-color');
     background-size: contain;
 }
+
 .tx-message .tx-card .tx-card-image {
     width: 40px;
     height: 40px;
@@ -811,6 +835,7 @@ only loads when the top comes into view*/
     position: relative;
     display: inline-block;
 }
+
 .tx-message .tx-card .tx-card-txt {
     flex: 1;
     height: 32px;
@@ -825,6 +850,7 @@ only loads when the top comes into view*/
 .file-message .file-card .file-card-txt:hover .file-card-tooltip {
     visibility: visible;
 }
+
 .tx-message .tx-card .tx-card-txt:hover .tx-card-tooltip {
     visibility: visible;
 }
@@ -844,6 +870,7 @@ only loads when the top comes into view*/
     bottom: 60px;
     z-index: 1;
 }
+
 .tx-message .tx-card .tx-card-txt .tx-card-tooltip {
     visibility: hidden;
     width: 320px;
@@ -865,6 +892,7 @@ only loads when the top comes into view*/
     height: 16px;
     line-height: 16px;
 }
+
 .tx-message .tx-card .tx-card-txt .tx-card-content {
     font-size: 12px;
     height: 16px;

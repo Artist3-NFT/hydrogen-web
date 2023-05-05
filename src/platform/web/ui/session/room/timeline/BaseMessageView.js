@@ -59,6 +59,7 @@ export class BaseMessageView extends TemplateView {
                 continuation: vm => vm.isContinuation,
                 replyingContainer: vm => vm.isReply,
                 'message-tx': vm => vm.isTx,
+                'message-claim': vm => vm.isClaim,
                 newOwn: vm => vm.isNewOwn,
             },
             ontouchmove: () => {

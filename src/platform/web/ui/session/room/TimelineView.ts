@@ -90,7 +90,9 @@ export class TimelineView extends TemplateView<TimelineViewModel> {
                 },
                 title: "Jump down",
                 onClick: async () => {
-                    this.jumpDown()
+                    // console.log('vm.', vm)
+                    this.jumpDown();
+                    // (vm as any)._options.tileOptions.roomVM._sendClaimMessage({ sender: 'UserAA', value: '0.213BTC', message: '1231231231231231' })
                 }
             }),
             // t.button({

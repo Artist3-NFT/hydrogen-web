@@ -79,6 +79,12 @@ export class BaseMessageTile extends SimpleTile {
         }
         return false;
     }
+    get isClaim() {
+        if (this._entry?._eventEntry?.event?.content?.msgtype === 'm.claim') {
+            return true;
+        }
+        return false;
+    }
 
     // Avatar view model contract
     get avatarColorNumber() {
